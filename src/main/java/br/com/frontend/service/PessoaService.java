@@ -1,8 +1,8 @@
 package br.com.frontend.service;
 
 import br.com.frontend.model.PessoaPageResponse;
-import br.com.frontend.model.dto.PessoaRequest;
-import br.com.frontend.model.dto.PessoaResponse;
+import br.com.frontend.dto.PessoaRequest;
+import br.com.frontend.dto.PessoaResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import java.util.List;

@@ -1,18 +1,18 @@
 package br.com.frontend.model;
 
-import br.com.frontend.dto.PessoaResponse;
+import br.com.frontend.dto.ContatoResponse;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PessoaPageResponse {
-    private List<PessoaResponse> content;
+public class ContatoPageResponse {
+    private List<ContatoResponse> content;
 
-    public List<PessoaResponse> getContent() {
+    public List<ContatoResponse> getContent() {
         return content;
     }
 
-    public void setContent(List<PessoaResponse> content) {
+    public void setContent(List<ContatoResponse> content) {
         this.content = content;
     }
 }

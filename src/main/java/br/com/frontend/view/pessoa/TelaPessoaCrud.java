@@ -1,8 +1,8 @@
-package br.com.frontend.view;
+package br.com.frontend.view.pessoa;
 
-import br.com.frontend.model.dto.PessoaRequest;
-import br.com.frontend.model.dto.PessoaResponse;
-import br.com.frontend.model.enums.TipoPessoa;
+import br.com.frontend.dto.PessoaRequest;
+import br.com.frontend.dto.PessoaResponse;
+import br.com.frontend.enums.TipoPessoa;
 import br.com.frontend.service.PessoaService;
 import org.springframework.stereotype.Component;
 

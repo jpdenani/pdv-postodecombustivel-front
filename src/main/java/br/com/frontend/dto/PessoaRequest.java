@@ -1,6 +1,6 @@
-package br.com.frontend.model.dto;
+package br.com.frontend.dto;
 
-import br.com.frontend.model.enums.TipoPessoa;
+import br.com.frontend.enums.TipoPessoa;
 import java.time.LocalDate;
 
 public record PessoaRequest(
