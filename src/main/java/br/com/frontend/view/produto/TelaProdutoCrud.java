@@ -7,6 +7,7 @@ import br.com.frontend.service.ProdutoService;
 import org.springframework.stereotype.Component;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
@@ -28,6 +29,9 @@ public class TelaProdutoCrud extends JPanel {
     public TelaProdutoCrud(ProdutoService produtoService) {
         this.produtoService = produtoService;
         setLayout(new BorderLayout());
+
+        int padding = 15;
+        setBorder(new EmptyBorder(padding, padding, padding, padding));
 
         String[] columnNames = {"ID","Nome","Referência","Categoria","Fornecedor","Marca","Tipo"};
         tableModel = new DefaultTableModel(columnNames,0){

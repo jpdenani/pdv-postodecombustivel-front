@@ -5,8 +5,6 @@ import br.com.frontend.dto.CustoResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,23 +25,20 @@ public class CustoService {
 
     public CustoResponse salvarCusto(CustoRequest request, Long id) {
         if (id == null) {
+            // Criar novo
             return restTemplate.postForObject(API_BASE_URL, request, CustoResponse.class);
         } else {
+            // Atualizar existente
             restTemplate.put(API_BASE_URL + "/" + id, request);
 
-            // Converte java.util.Date para java.time.LocalDate
-            LocalDate dataProcessamentoLocal = request.dataProcessamento() == null ? null :
-                    request.dataProcessamento().toInstant()
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalDate();
-
+            // ✅ CORRIGIDO: agora CustoResponse usa Date, não precisa converter
             return new CustoResponse(
                     id,
                     request.imposto(),
                     request.custoVariavel(),
                     request.custoFixo(),
                     request.margemLucro(),
-                    dataProcessamentoLocal
+                    request.dataProcessamento() // ✅ Já é Date!
             );
         }
     }

@@ -7,6 +7,7 @@ import br.com.frontend.service.PessoaService;
 import org.springframework.stereotype.Component;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.MaskFormatter;
 import java.awt.*;
@@ -16,7 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Component
-public class TelaPessoaCrud extends JFrame {
+public class TelaPessoaCrud extends JPanel {
 
     private final PessoaService pessoaService;
     private final DefaultTableModel tableModel;
@@ -32,10 +33,12 @@ public class TelaPessoaCrud extends JFrame {
     public TelaPessoaCrud(PessoaService pessoaService) {
         this.pessoaService = pessoaService;
 
-        setTitle("Cadastro de Pessoas");
-        setSize(1000, 700);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
+
+        int padding = 15;
+        setBorder(new EmptyBorder(padding, padding, padding, padding));
+
+        setBackground(Color.WHITE);
 
         // --- Modelo da Tabela ---
         String[] columnNames = {"ID", "Nome Completo", "CPF/CNPJ", "CTPS", "Data Nasc.", "Tipo"};
@@ -46,9 +49,11 @@ public class TelaPessoaCrud extends JFrame {
             }
         };
         table = new JTable(tableModel);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         // --- Formulário ---
         JPanel formPanel = new JPanel(new GridLayout(7, 2, 5, 5));
+        formPanel.setBorder(BorderFactory.createTitledBorder("Dados da Pessoa"));
         txtId.setEditable(false);
 
         try {
@@ -74,19 +79,21 @@ public class TelaPessoaCrud extends JFrame {
         // --- Botões ---
         JButton btnSalvar = new JButton("Salvar");
         JButton btnExcluir = new JButton("Excluir");
-        JButton btnLimpar = new JButton("Limpar Formulário");
+        JButton btnLimpar = new JButton("Limpar");
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(btnSalvar);
         buttonPanel.add(btnExcluir);
         buttonPanel.add(btnLimpar);
 
+        // --- Painel Superior ---
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(formPanel, BorderLayout.CENTER);
         topPanel.add(buttonPanel, BorderLayout.SOUTH);
 
-        getContentPane().add(topPanel, BorderLayout.NORTH);
-        getContentPane().add(new JScrollPane(table), BorderLayout.CENTER);
+        // --- Montagem da Tela ---
+        add(topPanel, BorderLayout.NORTH);
+        add(new JScrollPane(table), BorderLayout.CENTER);
 
         // --- Ações ---
         btnSalvar.addActionListener(e -> salvar());
@@ -143,7 +150,7 @@ public class TelaPessoaCrud extends JFrame {
         }
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        LocalDate dataNascimento = null;
+        LocalDate dataNascimento;
         try {
             dataNascimento = LocalDate.parse(txtDataNascimento.getText(), formatter);
         } catch (Exception e) {
@@ -190,24 +197,21 @@ public class TelaPessoaCrud extends JFrame {
         int confirm = JOptionPane.showConfirmDialog(this, "Tem certeza?",
                 "Confirmar Exclusão", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
-            Long id = table.getValueAt(table.getSelectedRow(), 0) != null ?
-                    Long.parseLong(table.getValueAt(table.getSelectedRow(), 0).toString()) : null;
-            if (id != null) {
-                new SwingWorker<Void, Void>() {
-                    @Override
-                    protected Void doInBackground() throws Exception {
-                        pessoaService.excluirPessoa(id);
-                        return null;
-                    }
+            Long id = Long.parseLong(table.getValueAt(table.getSelectedRow(), 0).toString());
+            new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    pessoaService.excluirPessoa(id);
+                    return null;
+                }
 
-                    @Override
-                    protected void done() {
-                        JOptionPane.showMessageDialog(TelaPessoaCrud.this, "Pessoa excluída com sucesso!");
-                        limparFormulario();
-                        atualizarTabela();
-                    }
-                }.execute();
-            }
+                @Override
+                protected void done() {
+                    JOptionPane.showMessageDialog(TelaPessoaCrud.this, "Pessoa excluída com sucesso!");
+                    limparFormulario();
+                    atualizarTabela();
+                }
+            }.execute();
         }
     }
 

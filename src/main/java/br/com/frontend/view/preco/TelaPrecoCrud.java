@@ -6,6 +6,7 @@ import br.com.frontend.service.PrecoService;
 import org.springframework.stereotype.Component;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.MaskFormatter;
 import java.awt.*;
@@ -30,6 +31,9 @@ public class TelaPrecoCrud extends JPanel {
     public TelaPrecoCrud(PrecoService precoService) {
         this.precoService = precoService;
         setLayout(new BorderLayout());
+
+        int padding = 15;
+        setBorder(new EmptyBorder(padding, padding, padding, padding));
 
         String[] columnNames = {"ID","Valor","Data Alteração","Hora Alteração"};
         tableModel = new DefaultTableModel(columnNames,0) {

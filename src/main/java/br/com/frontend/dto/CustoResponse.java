@@ -1,6 +1,6 @@
 package br.com.frontend.dto;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 public record CustoResponse(
         Long id,
@@ -8,5 +8,5 @@ public record CustoResponse(
         Double custoVariavel,
         Double custoFixo,
         Double margemLucro,
-        LocalDate dataProcessamento
+        Date dataProcessamento // ✅ MUDOU de LocalDate para Date
 ) {}

@@ -4,7 +4,6 @@ import br.com.frontend.dto.EstoqueRequest;
 import br.com.frontend.dto.EstoqueResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,7 +27,15 @@ public class EstoqueService {
             return restTemplate.postForObject(API_BASE_URL, request, EstoqueResponse.class);
         } else {
             restTemplate.put(API_BASE_URL + "/" + id, request);
-            return new EstoqueResponse(id, request.quantidade(), request.localTanque(), request.localEndereco(), request.loteFabricacao(), request.dataValidade(), request.tipoEstoque());
+            return new EstoqueResponse(
+                    id,
+                    request.quantidade(),
+                    request.localTanque(),
+                    request.localEndereco(),
+                    request.loteFabricacao(),
+                    request.dataValidade(),
+                    request.tipoEstoque()
+            );
         }
     }
 

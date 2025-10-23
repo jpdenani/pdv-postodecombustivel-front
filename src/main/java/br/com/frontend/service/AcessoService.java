@@ -18,11 +18,22 @@ public class AcessoService {
         this.restTemplate = restTemplate;
     }
 
+    // Lista todos os acessos, ajustando page/size para o backend
     public List<AcessoResponse> listarAcessos() {
-        AcessoResponse[] response = restTemplate.getForObject(API_BASE_URL + "?size=100", AcessoResponse[].class);
+        int page = 0;          // página inicial
+        int size = 100;        // ou maior se precisar de mais registros
+        String sortBy = "id";  // ordenar por id
+        String dir = "ASC";    // ordem crescente
+
+        String url = String.format("%s?page=%d&size=%d&sortBy=%s&dir=%s",
+                API_BASE_URL, page, size, sortBy, dir);
+
+        AcessoResponse[] response = restTemplate.getForObject(url, AcessoResponse[].class);
         return Arrays.asList(response != null ? response : new AcessoResponse[0]);
     }
 
+
+    // Salvar ou atualizar acesso
     public AcessoResponse salvarAcesso(AcessoRequest request, Long id) {
         if (id == null) {
             return restTemplate.postForObject(API_BASE_URL, request, AcessoResponse.class);
@@ -32,13 +43,13 @@ public class AcessoService {
         }
     }
 
+    // Excluir acesso
     public void excluirAcesso(Long id) {
         restTemplate.delete(API_BASE_URL + "/" + id);
     }
 
+    // Autenticação simples
     public boolean autenticar(String usuario, String senha) {
-        // Aqui você pode chamar um endpoint de login do backend
-        // Para simplificação, você pode listar e verificar:
         return listarAcessos().stream()
                 .anyMatch(a -> a.usuario().equals(usuario) && a.senha().equals(senha));
     }

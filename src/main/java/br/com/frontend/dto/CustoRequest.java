@@ -1,6 +1,5 @@
 package br.com.frontend.dto;
 
-import java.time.LocalDate;
 import java.util.Date;
 
 public record CustoRequest(
