@@ -1,10 +1,11 @@
 package br.com.frontend.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 public record PrecoRequest(
-        Double valor,
+        BigDecimal valor,
         LocalDate dataAlteracao,
         LocalTime horaAlteracao
 ) {}
