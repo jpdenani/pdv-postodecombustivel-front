@@ -85,6 +85,20 @@ public class TelaVenda extends JFrame {
         cbProduto = new JComboBox<>();
         cbProduto.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         cbProduto.setPreferredSize(new Dimension(300, 35));
+
+        // ✅ CORREÇÃO: Renderizador customizado para mostrar só o nome do produto
+        cbProduto.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public java.awt.Component getListCellRendererComponent(JList<?> list, Object value,
+                                                                   int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof ProdutoResponse) {
+                    setText(((ProdutoResponse) value).nome());
+                }
+                return this;
+            }
+        });
+
         cbProduto.addActionListener(e -> atualizarPreco());
         formPanel.add(cbProduto, gbc);
 
@@ -204,12 +218,22 @@ public class TelaVenda extends JFrame {
         SwingWorker<PrecoResponse, Void> worker = new SwingWorker<>() {
             @Override
             protected PrecoResponse doInBackground() throws Exception {
-                // Busca o preço mais recente
-                PrecoResponse[] precos = restTemplate.getForObject(API_PRECOS, PrecoResponse[].class);
-                if (precos != null && precos.length > 0) {
-                    return precos[precos.length - 1]; // Pega o último (mais recente)
+                // ✅ CORREÇÃO: Busca o preço pelo ID do produto (produto ID 1 = preço ID 1)
+                try {
+                    PrecoResponse preco = restTemplate.getForObject(
+                            API_PRECOS + "/" + produtoSelecionado.id(),
+                            PrecoResponse.class
+                    );
+                    return preco;
+                } catch (Exception e) {
+                    // Se não encontrar preço específico, busca o último preço geral
+                    System.err.println("Preço específico não encontrado, usando preço geral");
+                    PrecoResponse[] precos = restTemplate.getForObject(API_PRECOS, PrecoResponse[].class);
+                    if (precos != null && precos.length > 0) {
+                        return precos[precos.length - 1];
+                    }
+                    return null;
                 }
-                return null;
             }
 
             @Override
@@ -219,6 +243,8 @@ public class TelaVenda extends JFrame {
                     if (precoAtual != null) {
                         lblValorUnitario.setText(String.format("R$ %.2f", precoAtual.valor()));
                         calcularTotal();
+                    } else {
+                        lblValorUnitario.setText("Sem preço cadastrado");
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();

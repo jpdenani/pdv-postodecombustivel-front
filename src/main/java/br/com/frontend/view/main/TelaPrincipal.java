@@ -3,25 +3,43 @@ package br.com.frontend.view.main;
 import br.com.frontend.dto.AcessoResponse;
 import br.com.frontend.dto.BombaResponse;
 import br.com.frontend.enums.TipoAcesso;
+import br.com.frontend.view.acesso.TelaAcessoCrud;
+import br.com.frontend.view.bomba.TelaBombaCrud;
+import br.com.frontend.view.contato.TelaContatoCrud;
+import br.com.frontend.view.custo.TelaCustoCrud;
+import br.com.frontend.view.estoque.TelaEstoqueCrud;
+import br.com.frontend.view.pessoa.TelaPessoaCrud;
+import br.com.frontend.view.preco.TelaPrecoCrud;
+import br.com.frontend.view.produto.TelaProdutoCrud;
 import br.com.frontend.view.venda.TelaVenda;
 import jakarta.annotation.PostConstruct;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class TelaPrincipal extends JFrame {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final String API_BOMBAS = "http://localhost:8080/api/v1/bombas";
+    private final ApplicationContext context;
 
     private AcessoResponse usuarioLogado;
+    private JTabbedPane tabbedPane;
     private JPanel painelBombas;
     private JLabel lblUsuario;
     private JMenuBar menuBar;
+    private Map<String, java.awt.Component> abasAbertas = new HashMap<>();
+
+    public TelaPrincipal(ApplicationContext context) {
+        this.context = context;
+    }
 
     @PostConstruct
     public void init() {
@@ -29,23 +47,32 @@ public class TelaPrincipal extends JFrame {
         setSize(1200, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-
-        // Layout principal
         setLayout(new BorderLayout());
 
         // Barra superior
         JPanel topPanel = createTopPanel();
         add(topPanel, BorderLayout.NORTH);
 
-        // Painel central com as bombas
+        // TabbedPane para múltiplas abas
+        tabbedPane = new JTabbedPane();
+        tabbedPane.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        tabbedPane.setTabPlacement(JTabbedPane.TOP);
+
+        // Aba inicial: Painel de Bombas
         painelBombas = new JPanel();
-        painelBombas.setLayout(new GridLayout(0, 3, 20, 20));
-        painelBombas.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        painelBombas.setLayout(new BorderLayout(10, 10));
         painelBombas.setBackground(new Color(236, 240, 241));
 
-        JScrollPane scrollPane = new JScrollPane(painelBombas);
-        scrollPane.setBorder(null);
-        add(scrollPane, BorderLayout.CENTER);
+        JPanel painelBombasWrapper = criarPainelBombas();
+        painelBombas.add(painelBombasWrapper, BorderLayout.CENTER);
+
+        JScrollPane scrollBombas = new JScrollPane(painelBombas);
+        scrollBombas.setBorder(null);
+        scrollBombas.getVerticalScrollBar().setUnitIncrement(16);
+
+        tabbedPane.addTab("🏪 Bombas", scrollBombas);
+
+        add(tabbedPane, BorderLayout.CENTER);
     }
 
     private JPanel createTopPanel() {
@@ -69,54 +96,79 @@ public class TelaPrincipal extends JFrame {
         return topPanel;
     }
 
+    private JPanel criarPainelBombas() {
+        JPanel wrapper = new JPanel(new BorderLayout(10, 10));
+        wrapper.setBackground(new Color(236, 240, 241));
+        wrapper.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        // Título e botão de cadastro
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(new Color(236, 240, 241));
+
+        JLabel lblTituloBombas = new JLabel("Selecione uma Bomba");
+        lblTituloBombas.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        lblTituloBombas.setForeground(new Color(52, 73, 94));
+
+        JButton btnCadastrarBomba = new JButton("➕ Cadastrar Bomba");
+        btnCadastrarBomba.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btnCadastrarBomba.setBackground(new Color(46, 204, 113));
+        btnCadastrarBomba.setForeground(Color.WHITE);
+        btnCadastrarBomba.setFocusPainted(false);
+        btnCadastrarBomba.setBorderPainted(false);
+        btnCadastrarBomba.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnCadastrarBomba.setPreferredSize(new Dimension(180, 40));
+        btnCadastrarBomba.addActionListener(e -> abrirAbaCadastroBombas());
+
+        headerPanel.add(lblTituloBombas, BorderLayout.WEST);
+        headerPanel.add(btnCadastrarBomba, BorderLayout.EAST);
+
+        // Grid de bombas
+        JPanel gridBombas = new JPanel(new GridLayout(0, 3, 20, 20));
+        gridBombas.setBackground(new Color(236, 240, 241));
+
+        wrapper.add(headerPanel, BorderLayout.NORTH);
+        wrapper.add(gridBombas, BorderLayout.CENTER);
+
+        return wrapper;
+    }
+
     private void createMenuBar() {
         menuBar = new JMenuBar();
+        // ✅ CORREÇÃO: Fundo mais escuro e visível
         menuBar.setBackground(new Color(44, 62, 80));
+        menuBar.setBorderPainted(false);
 
         // Menu Gestão (apenas admin)
         if (usuarioLogado.tipoAcesso() == TipoAcesso.ADMINISTRADOR) {
-            JMenu menuGestao = new JMenu("Gestão");
-            menuGestao.setForeground(Color.WHITE);
-            menuGestao.setFont(new Font("Segoe UI", Font.BOLD, 13));
-
-            JMenuItem itemEstoque = new JMenuItem("Estoque");
-            JMenuItem itemCusto = new JMenuItem("Custo");
-
+            JMenu menuGestao = criarMenu("Gestão");
+            JMenuItem itemEstoque = criarMenuItem("📦 Estoque", e -> abrirAba("Estoque", context.getBean(TelaEstoqueCrud.class)));
+            JMenuItem itemCusto = criarMenuItem("💰 Custo", e -> abrirAba("Custo", context.getBean(TelaCustoCrud.class)));
             menuGestao.add(itemEstoque);
             menuGestao.add(itemCusto);
             menuBar.add(menuGestao);
 
-            // Menu Usuários (apenas admin)
-            JMenu menuUsuarios = new JMenu("Usuários");
-            menuUsuarios.setForeground(Color.WHITE);
-            menuUsuarios.setFont(new Font("Segoe UI", Font.BOLD, 13));
-
-            JMenuItem itemPessoas = new JMenuItem("Pessoas");
-            JMenuItem itemContatos = new JMenuItem("Contatos");
-            JMenuItem itemAcessos = new JMenuItem("Acessos");
-
+            // Menu Usuários
+            JMenu menuUsuarios = criarMenu("Usuários");
+            JMenuItem itemPessoas = criarMenuItem("👤 Pessoas", e -> abrirAba("Pessoas", context.getBean(TelaPessoaCrud.class)));
+            JMenuItem itemContatos = criarMenuItem("📞 Contatos", e -> abrirAba("Contatos", context.getBean(TelaContatoCrud.class)));
+            JMenuItem itemAcessos = criarMenuItem("🔐 Acessos", e -> abrirAba("Acessos", context.getBean(TelaAcessoCrud.class)));
             menuUsuarios.add(itemPessoas);
             menuUsuarios.add(itemContatos);
             menuUsuarios.add(itemAcessos);
             menuBar.add(menuUsuarios);
 
-            // Menu Produtos e Preços (apenas admin)
-            JMenu menuProdutos = new JMenu("Produtos e Preços");
-            menuProdutos.setForeground(Color.WHITE);
-            menuProdutos.setFont(new Font("Segoe UI", Font.BOLD, 13));
-
-            JMenuItem itemProdutos = new JMenuItem("Cadastro de Produtos");
-            JMenuItem itemPrecos = new JMenuItem("Cadastro de Preços");
-
+            // Menu Produtos e Preços
+            JMenu menuProdutos = criarMenu("Produtos");
+            JMenuItem itemProdutos = criarMenuItem("🛢️ Produtos", e -> abrirAba("Produtos", context.getBean(TelaProdutoCrud.class)));
+            JMenuItem itemPrecos = criarMenuItem("💵 Preços", e -> abrirAba("Preços", context.getBean(TelaPrecoCrud.class)));
             menuProdutos.add(itemProdutos);
             menuProdutos.add(itemPrecos);
             menuBar.add(menuProdutos);
         }
 
         // Menu Sair (todos)
-        JMenu menuSair = new JMenu("Sair");
-        menuSair.setForeground(Color.WHITE);
-        menuSair.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        menuBar.add(Box.createHorizontalGlue());
+        JMenu menuSair = criarMenu("❌ Sair");
         menuSair.addMenuListener(new javax.swing.event.MenuListener() {
             public void menuSelected(javax.swing.event.MenuEvent e) {
                 int confirm = JOptionPane.showConfirmDialog(
@@ -132,10 +184,103 @@ public class TelaPrincipal extends JFrame {
             public void menuDeselected(javax.swing.event.MenuEvent e) {}
             public void menuCanceled(javax.swing.event.MenuEvent e) {}
         });
-        menuBar.add(Box.createHorizontalGlue());
         menuBar.add(menuSair);
 
         setJMenuBar(menuBar);
+    }
+
+    private JMenu criarMenu(String texto) {
+        JMenu menu = new JMenu(texto);
+        // ✅ CORREÇÃO: Texto branco bem visível
+        menu.setForeground(Color.WHITE);
+        menu.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        menu.setOpaque(true);
+        menu.setBackground(new Color(44, 62, 80));
+        return menu;
+    }
+
+    private JMenuItem criarMenuItem(String texto, java.awt.event.ActionListener action) {
+        JMenuItem item = new JMenuItem(texto);
+        item.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        // ✅ CORREÇÃO: Texto escuro para contraste com fundo branco do item
+        item.setForeground(new Color(44, 62, 80));
+        item.setBackground(Color.WHITE);
+        item.addActionListener(action);
+        return item;
+    }
+
+    private void abrirAba(String titulo, Object telaBean) {
+        // Verifica se a aba já está aberta
+        if (abasAbertas.containsKey(titulo)) {
+            java.awt.Component component = abasAbertas.get(titulo);
+            tabbedPane.setSelectedComponent(component);
+            return;
+        }
+
+        // Converte o bean para JPanel
+        JPanel tela = (JPanel) telaBean;
+
+        // Inicializa o painel se tiver método init()
+        try {
+            tela.getClass().getMethod("init").invoke(tela);
+        } catch (Exception e) {
+            // Se não tiver init(), ignora
+        }
+
+        // Cria wrapper com botão de fechar
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.add(tela, BorderLayout.CENTER);
+
+        // Adiciona a aba
+        tabbedPane.addTab(titulo, wrapper);
+        abasAbertas.put(titulo, wrapper);
+
+        // Cria componente customizado para o tab com botão de fechar
+        int index = tabbedPane.indexOfComponent(wrapper);
+        JPanel tabComponent = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        tabComponent.setOpaque(false);
+
+        JLabel lblTitulo = new JLabel(titulo);
+        lblTitulo.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+
+        JButton btnFechar = new JButton("✕");
+        btnFechar.setFont(new Font("Arial", Font.PLAIN, 12));
+        btnFechar.setBorderPainted(false);
+        btnFechar.setContentAreaFilled(false);
+        btnFechar.setFocusPainted(false);
+        btnFechar.setPreferredSize(new Dimension(20, 20));
+        btnFechar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnFechar.addActionListener(e -> fecharAba(titulo, wrapper));
+
+        tabComponent.add(lblTitulo);
+        tabComponent.add(btnFechar);
+        tabbedPane.setTabComponentAt(index, tabComponent);
+
+        // Seleciona a nova aba
+        tabbedPane.setSelectedComponent(wrapper);
+    }
+
+    private void abrirAbaCadastroBombas() {
+        try {
+            TelaBombaCrud telaBomba = context.getBean(TelaBombaCrud.class);
+            abrirAba("Cadastro de Bombas", telaBomba);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Erro ao abrir cadastro de bombas: " + ex.getMessage(),
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    private void fecharAba(String titulo, java.awt.Component component) {
+        int index = tabbedPane.indexOfComponent(component);
+        if (index > 0) { // Não fecha a aba de Bombas (index 0)
+            tabbedPane.remove(index);
+            abasAbertas.remove(titulo);
+        }
     }
 
     public void setUsuarioLogado(AcessoResponse usuario) {
@@ -162,22 +307,26 @@ public class TelaPrincipal extends JFrame {
             protected void done() {
                 try {
                     List<BombaResponse> bombas = get();
-                    painelBombas.removeAll();
+
+                    // Pega o grid de bombas
+                    JPanel wrapper = (JPanel) painelBombas.getComponent(0);
+                    JPanel gridBombas = (JPanel) wrapper.getComponent(1);
+                    gridBombas.removeAll();
 
                     if (bombas.isEmpty()) {
-                        JLabel lblSemBombas = new JLabel("Nenhuma bomba cadastrada");
+                        JLabel lblSemBombas = new JLabel("Nenhuma bomba cadastrada. Clique em 'Cadastrar Bomba' para adicionar.");
                         lblSemBombas.setFont(new Font("Segoe UI", Font.PLAIN, 16));
                         lblSemBombas.setForeground(Color.GRAY);
                         lblSemBombas.setHorizontalAlignment(SwingConstants.CENTER);
-                        painelBombas.add(lblSemBombas);
+                        gridBombas.add(lblSemBombas);
                     } else {
                         for (BombaResponse bomba : bombas) {
-                            painelBombas.add(criarPainelBomba(bomba));
+                            gridBombas.add(criarCardBomba(bomba));
                         }
                     }
 
-                    painelBombas.revalidate();
-                    painelBombas.repaint();
+                    gridBombas.revalidate();
+                    gridBombas.repaint();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(
@@ -192,42 +341,40 @@ public class TelaPrincipal extends JFrame {
         worker.execute();
     }
 
-    private JPanel criarPainelBomba(BombaResponse bomba) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createCompoundBorder(
+    private JPanel criarCardBomba(BombaResponse bomba) {
+        JPanel card = new JPanel();
+        card.setLayout(new BorderLayout(10, 10));
+        card.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(189, 195, 199), 2),
                 BorderFactory.createEmptyBorder(20, 20, 20, 20)
         ));
 
-        // Cor de fundo baseada no status
+        // Cor baseada no status
         Color corFundo;
+        Color corBorda;
         switch (bomba.tipoBomba()) {
             case DISPONIVEL:
                 corFundo = new Color(46, 204, 113, 30);
-                panel.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(46, 204, 113), 3),
-                        BorderFactory.createEmptyBorder(20, 20, 20, 20)
-                ));
+                corBorda = new Color(46, 204, 113);
                 break;
             case OCUPADA:
                 corFundo = new Color(241, 196, 15, 30);
-                panel.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(241, 196, 15), 3),
-                        BorderFactory.createEmptyBorder(20, 20, 20, 20)
-                ));
+                corBorda = new Color(241, 196, 15);
                 break;
             case MANUTENCAO:
                 corFundo = new Color(231, 76, 60, 30);
-                panel.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(231, 76, 60), 3),
-                        BorderFactory.createEmptyBorder(20, 20, 20, 20)
-                ));
+                corBorda = new Color(231, 76, 60);
                 break;
             default:
                 corFundo = Color.WHITE;
+                corBorda = new Color(189, 195, 199);
         }
-        panel.setBackground(corFundo);
+
+        card.setBackground(corFundo);
+        card.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(corBorda, 3),
+                BorderFactory.createEmptyBorder(20, 20, 20, 20)
+        ));
 
         // Número da bomba
         JLabel lblNumero = new JLabel("BOMBA " + bomba.numero(), SwingConstants.CENTER);
@@ -256,11 +403,11 @@ public class TelaPrincipal extends JFrame {
             btnSelecionar.setBackground(new Color(189, 195, 199));
         }
 
-        panel.add(lblNumero, BorderLayout.NORTH);
-        panel.add(lblStatus, BorderLayout.CENTER);
-        panel.add(btnSelecionar, BorderLayout.SOUTH);
+        card.add(lblNumero, BorderLayout.NORTH);
+        card.add(lblStatus, BorderLayout.CENTER);
+        card.add(btnSelecionar, BorderLayout.SOUTH);
 
-        return panel;
+        return card;
     }
 
     private void abrirTelaVenda(BombaResponse bomba) {

@@ -27,6 +27,8 @@ public class EstoqueService {
             return restTemplate.postForObject(API_BASE_URL, request, EstoqueResponse.class);
         } else {
             restTemplate.put(API_BASE_URL + "/" + id, request);
+
+            // ✅ Cria uma resposta "simples" só pra feedback
             return new EstoqueResponse(
                     id,
                     request.quantidade(),
@@ -34,10 +36,13 @@ public class EstoqueService {
                     request.localEndereco(),
                     request.loteFabricacao(),
                     request.dataValidade(),
-                    request.tipoEstoque()
+                    request.tipoEstoque(),
+                    new java.math.BigDecimal("150000"), // capacidade padrão
+                    null // percentual será atualizado quando recarregar do backend
             );
         }
     }
+
 
     public void excluirEstoque(Long id) {
         restTemplate.delete(API_BASE_URL + "/" + id);

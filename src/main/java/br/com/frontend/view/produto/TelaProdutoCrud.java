@@ -170,14 +170,15 @@ public class TelaProdutoCrud extends JPanel {
                     List<ProdutoResponse> produtos = get();
                     tableModel.setRowCount(0);
                     for (ProdutoResponse p : produtos) {
+                        // ✅ CORREÇÃO: Ordem correta dos campos na tabela
                         tableModel.addRow(new Object[]{
-                                p.id(),
-                                p.nome(),
-                                p.referencia(),
-                                p.categoria(),
-                                p.fornecedor(),
-                                p.marca(),
-                                p.tipoProduto()
+                                p.id(),           // ID (coluna 0 - oculta)
+                                p.nome(),         // Nome (coluna 1)
+                                p.referencia(),   // Referência (coluna 2)
+                                p.marca(),        // MARCA (coluna 3) - CORRIGIDO
+                                p.fornecedor(),   // Fornecedor (coluna 4)
+                                p.categoria(),    // CATEGORIA (coluna 5) - CORRIGIDO
+                                p.tipoProduto()   // Tipo (coluna 6)
                         });
                     }
                 } catch (Exception ex) {
@@ -198,11 +199,12 @@ public class TelaProdutoCrud extends JPanel {
     private void preencherFormulario() {
         int linhaSelecionada = table.getSelectedRow();
         if (linhaSelecionada >= 0) {
+            // ✅ CORREÇÃO: Leitura correta das colunas
             txtNome.setText(String.valueOf(tableModel.getValueAt(linhaSelecionada, 1)));
             txtReferencia.setText(String.valueOf(tableModel.getValueAt(linhaSelecionada, 2)));
-            txtCategoria.setText(String.valueOf(tableModel.getValueAt(linhaSelecionada, 3)));
+            txtMarca.setText(String.valueOf(tableModel.getValueAt(linhaSelecionada, 3)));        // MARCA - coluna 3
             txtFornecedor.setText(String.valueOf(tableModel.getValueAt(linhaSelecionada, 4)));
-            txtMarca.setText(String.valueOf(tableModel.getValueAt(linhaSelecionada, 5)));
+            txtCategoria.setText(String.valueOf(tableModel.getValueAt(linhaSelecionada, 5)));    // CATEGORIA - coluna 5
 
             Object tipoObj = tableModel.getValueAt(linhaSelecionada, 6);
             if (tipoObj instanceof TipoProduto) {
