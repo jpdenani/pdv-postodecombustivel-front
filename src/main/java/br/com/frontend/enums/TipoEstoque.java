@@ -1,11 +1,10 @@
 package br.com.frontend.enums;
 
-// ✅ ENUM ATUALIZADO com os novos percentuais
 public enum TipoEstoque {
-    CRITICO("Crítico"),      // 0-20%
-    BAIXO("Baixo"),          // 20-45%
-    MEDIO("Médio"),          // 45-75%
-    ALTO("Alto");            // 75-100%
+    CRITICO("Crítico"),
+    BAIXO("Baixo"),
+    MEDIO("Médio"),
+    ALTO("Alto");
 
     private final String descricao;
 
@@ -14,11 +13,6 @@ public enum TipoEstoque {
     }
 
     public String getDescricao() {
-        return descricao;
-    }
-
-    @Override
-    public String toString() {
         return descricao;
     }
 }

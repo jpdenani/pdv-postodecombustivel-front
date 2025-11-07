@@ -37,6 +37,9 @@ public class TelaPrincipal extends JFrame {
     private JMenuBar menuBar;
     private Map<String, java.awt.Component> abasAbertas = new HashMap<>();
 
+    // ✅ Referência para a tela de estoque (para atualizar após vendas)
+    private TelaEstoqueCrud telaEstoqueCrud;
+
     public TelaPrincipal(ApplicationContext context) {
         this.context = context;
     }
@@ -134,14 +137,13 @@ public class TelaPrincipal extends JFrame {
 
     private void createMenuBar() {
         menuBar = new JMenuBar();
-        // ✅ CORREÇÃO: Fundo mais escuro e visível
         menuBar.setBackground(new Color(44, 62, 80));
         menuBar.setBorderPainted(false);
 
         // Menu Gestão (apenas admin)
         if (usuarioLogado.tipoAcesso() == TipoAcesso.ADMINISTRADOR) {
             JMenu menuGestao = criarMenu("Gestão");
-            JMenuItem itemEstoque = criarMenuItem("📦 Estoque", e -> abrirAba("Estoque", context.getBean(TelaEstoqueCrud.class)));
+            JMenuItem itemEstoque = criarMenuItem("📦 Estoque", e -> abrirAbaEstoque());
             JMenuItem itemCusto = criarMenuItem("💰 Custo", e -> abrirAba("Custo", context.getBean(TelaCustoCrud.class)));
             menuGestao.add(itemEstoque);
             menuGestao.add(itemCusto);
@@ -191,7 +193,6 @@ public class TelaPrincipal extends JFrame {
 
     private JMenu criarMenu(String texto) {
         JMenu menu = new JMenu(texto);
-        // ✅ CORREÇÃO: Texto branco bem visível
         menu.setForeground(Color.WHITE);
         menu.setFont(new Font("Segoe UI", Font.BOLD, 14));
         menu.setOpaque(true);
@@ -202,11 +203,24 @@ public class TelaPrincipal extends JFrame {
     private JMenuItem criarMenuItem(String texto, java.awt.event.ActionListener action) {
         JMenuItem item = new JMenuItem(texto);
         item.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        // ✅ CORREÇÃO: Texto escuro para contraste com fundo branco do item
         item.setForeground(new Color(44, 62, 80));
         item.setBackground(Color.WHITE);
         item.addActionListener(action);
         return item;
+    }
+
+    // ✅ Método específico para abrir a aba de estoque e guardar referência
+    private void abrirAbaEstoque() {
+        // Verifica se já está aberta
+        if (abasAbertas.containsKey("Estoque")) {
+            java.awt.Component component = abasAbertas.get("Estoque");
+            tabbedPane.setSelectedComponent(component);
+            return;
+        }
+
+        // Obtém ou cria a instância da tela de estoque
+        telaEstoqueCrud = context.getBean(TelaEstoqueCrud.class);
+        abrirAba("Estoque", telaEstoqueCrud);
     }
 
     private void abrirAba(String titulo, Object telaBean) {
@@ -280,6 +294,11 @@ public class TelaPrincipal extends JFrame {
         if (index > 0) { // Não fecha a aba de Bombas (index 0)
             tabbedPane.remove(index);
             abasAbertas.remove(titulo);
+
+            // ✅ Se fechar a aba de estoque, limpa a referência
+            if (titulo.equals("Estoque")) {
+                telaEstoqueCrud = null;
+            }
         }
     }
 
@@ -412,6 +431,15 @@ public class TelaPrincipal extends JFrame {
 
     private void abrirTelaVenda(BombaResponse bomba) {
         TelaVenda telaVenda = new TelaVenda(bomba, usuarioLogado, this);
+
+        // ✅ CONEXÃO DO LISTENER: Se a tela de estoque estiver aberta, atualiza após venda
+        if (telaEstoqueCrud != null) {
+            telaVenda.setEstoqueUpdateListener(() -> {
+                System.out.println("🔄 Atualizando estoque após venda...");
+                telaEstoqueCrud.recarregarEstoques();
+            });
+        }
+
         telaVenda.setVisible(true);
         setVisible(false);
     }

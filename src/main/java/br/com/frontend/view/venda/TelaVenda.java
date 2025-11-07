@@ -1,6 +1,7 @@
 package br.com.frontend.view.venda;
 
 import br.com.frontend.dto.*;
+import br.com.frontend.listener.EstoqueUpdateListener;
 import br.com.frontend.view.main.TelaPrincipal;
 import org.springframework.web.client.RestTemplate;
 
@@ -19,6 +20,7 @@ public class TelaVenda extends JFrame {
     private final BombaResponse bomba;
     private final AcessoResponse usuario;
     private final TelaPrincipal telaPrincipal;
+    private EstoqueUpdateListener estoqueUpdateListener; // ✅ NOVO
 
     private JComboBox<ProdutoResponse> cbProduto;
     private JTextField txtLitros;
@@ -35,6 +37,11 @@ public class TelaVenda extends JFrame {
         this.telaPrincipal = telaPrincipal;
         initComponents();
         carregarProdutos();
+    }
+
+    // ✅ NOVO MÉTODO - Permite registrar listener
+    public void setEstoqueUpdateListener(EstoqueUpdateListener listener) {
+        this.estoqueUpdateListener = listener;
     }
 
     private void initComponents() {
@@ -86,7 +93,6 @@ public class TelaVenda extends JFrame {
         cbProduto.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         cbProduto.setPreferredSize(new Dimension(300, 35));
 
-        // ✅ CORREÇÃO: Renderizador customizado para mostrar só o nome do produto
         cbProduto.setRenderer(new DefaultListCellRenderer() {
             @Override
             public java.awt.Component getListCellRendererComponent(JList<?> list, Object value,
@@ -218,7 +224,6 @@ public class TelaVenda extends JFrame {
         SwingWorker<PrecoResponse, Void> worker = new SwingWorker<>() {
             @Override
             protected PrecoResponse doInBackground() throws Exception {
-                // ✅ CORREÇÃO: Busca o preço pelo ID do produto (produto ID 1 = preço ID 1)
                 try {
                     PrecoResponse preco = restTemplate.getForObject(
                             API_PRECOS + "/" + produtoSelecionado.id(),
@@ -226,7 +231,6 @@ public class TelaVenda extends JFrame {
                     );
                     return preco;
                 } catch (Exception e) {
-                    // Se não encontrar preço específico, busca o último preço geral
                     System.err.println("Preço específico não encontrado, usando preço geral");
                     PrecoResponse[] precos = restTemplate.getForObject(API_PRECOS, PrecoResponse[].class);
                     if (precos != null && precos.length > 0) {
@@ -303,6 +307,12 @@ public class TelaVenda extends JFrame {
                 protected void done() {
                     try {
                         VendaResponse venda = get();
+
+                        // ✅ NOTIFICA QUE O ESTOQUE FOI ATUALIZADO
+                        if (estoqueUpdateListener != null) {
+                            estoqueUpdateListener.onEstoqueAtualizado();
+                        }
+
                         JOptionPane.showMessageDialog(
                                 TelaVenda.this,
                                 String.format("Venda realizada com sucesso!\nTotal: R$ %.2f", venda.valorTotal()),
@@ -312,12 +322,22 @@ public class TelaVenda extends JFrame {
                         voltar();
                     } catch (Exception ex) {
                         ex.printStackTrace();
-                        JOptionPane.showMessageDialog(
-                                TelaVenda.this,
-                                "Erro ao realizar venda: " + ex.getMessage(),
-                                "Erro",
-                                JOptionPane.ERROR_MESSAGE
-                        );
+                        String errorMsg = ex.getMessage();
+                        if (errorMsg != null && errorMsg.contains("Estoque insuficiente")) {
+                            JOptionPane.showMessageDialog(
+                                    TelaVenda.this,
+                                    errorMsg,
+                                    "Estoque Insuficiente",
+                                    JOptionPane.WARNING_MESSAGE
+                            );
+                        } else {
+                            JOptionPane.showMessageDialog(
+                                    TelaVenda.this,
+                                    "Erro ao realizar venda: " + errorMsg,
+                                    "Erro",
+                                    JOptionPane.ERROR_MESSAGE
+                            );
+                        }
                         btnConfirmar.setEnabled(true);
                         btnConfirmar.setText("CONFIRMAR VENDA");
                     }
