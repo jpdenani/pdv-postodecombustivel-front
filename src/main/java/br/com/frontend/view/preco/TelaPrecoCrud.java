@@ -41,7 +41,7 @@ public class TelaPrecoCrud extends JPanel {
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // ====== Tabela ======
+
         String[] colunas = {"ID", "Valor", "Data Alteração", "Hora Alteração"};
         tableModel = new DefaultTableModel(colunas, 0) {
             @Override
@@ -60,7 +60,7 @@ public class TelaPrecoCrud extends JPanel {
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setRowHeight(25);
 
-        // Esconde a coluna ID
+
         table.getColumnModel().getColumn(0).setMinWidth(0);
         table.getColumnModel().getColumn(0).setMaxWidth(0);
         table.getColumnModel().getColumn(0).setWidth(0);
@@ -69,7 +69,7 @@ public class TelaPrecoCrud extends JPanel {
         scrollPane.setBorder(BorderFactory.createTitledBorder("Lista de Preços"));
         add(scrollPane, BorderLayout.CENTER);
 
-        // ====== Formulário ======
+
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBorder(BorderFactory.createTitledBorder("Dados do Preço"));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -91,36 +91,29 @@ public class TelaPrecoCrud extends JPanel {
             txtHoraAlteracao = new JFormattedTextField();
         }
 
-        // Linha 0: Valor
+
         gbc.gridx = 0; gbc.gridy = 0;
         formPanel.add(new JLabel("Valor (R$):"), gbc);
         gbc.gridx = 1;
         formPanel.add(txtValor, gbc);
 
-        // Linha 1: Data
+
         gbc.gridx = 0; gbc.gridy = 1;
         formPanel.add(new JLabel("Data Alteração:"), gbc);
         gbc.gridx = 1;
         formPanel.add(txtDataAlteracao, gbc);
 
-        // Linha 2: Hora
+
         gbc.gridx = 0; gbc.gridy = 2;
         formPanel.add(new JLabel("Hora Alteração:"), gbc);
         gbc.gridx = 1;
         formPanel.add(txtHoraAlteracao, gbc);
 
-        // Linha 3: Botões
+
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         btnNovo = new JButton("Novo");
         btnSalvar = new JButton("Salvar");
         btnExcluir = new JButton("Excluir");
-
-        btnNovo.setBackground(new Color(76, 175, 80));
-        btnNovo.setForeground(Color.WHITE);
-        btnSalvar.setBackground(new Color(33, 150, 243));
-        btnSalvar.setForeground(Color.WHITE);
-        btnExcluir.setBackground(new Color(244, 67, 54));
-        btnExcluir.setForeground(Color.WHITE);
 
         buttonPanel.add(btnNovo);
         buttonPanel.add(btnSalvar);
@@ -132,7 +125,7 @@ public class TelaPrecoCrud extends JPanel {
 
         add(formPanel, BorderLayout.SOUTH);
 
-        // ====== Ações ======
+
         btnNovo.addActionListener(e -> limparFormulario());
         btnSalvar.addActionListener(e -> salvarOuAtualizar());
         btnExcluir.addActionListener(e -> excluirSelecionado());
@@ -200,73 +193,52 @@ public class TelaPrecoCrud extends JPanel {
     private void salvarOuAtualizar() {
         try {
             String valorStr = txtValor.getText().trim();
-            String dataStr = txtDataAlteracao.getText().trim();
-            String horaStr = txtHoraAlteracao.getText().trim();
 
-            if (valorStr.isEmpty() || dataStr.isEmpty() || horaStr.isEmpty() ||
-                    dataStr.contains("_") || horaStr.contains("_")) {
+            if (valorStr.isEmpty()) {
                 JOptionPane.showMessageDialog(
                         this,
-                        "Por favor, preencha todos os campos!",
+                        "Por favor, preencha o valor!",
                         "Validação",
                         JOptionPane.WARNING_MESSAGE
                 );
                 return;
             }
 
-            BigDecimal valor = new BigDecimal(valorStr);
-            LocalDate data = LocalDate.parse(dataStr, dateFormatter);
-            LocalTime hora = LocalTime.parse(horaStr, timeFormatter);
+            // ✅ Define automaticamente a data e hora atuais
+            LocalDate dataAtual = LocalDate.now();
+            LocalTime horaAtual = LocalTime.now();
 
-            PrecoRequest req = new PrecoRequest(valor, data, hora);
+            txtDataAlteracao.setText(dataAtual.format(dateFormatter));
+            txtHoraAlteracao.setText(horaAtual.format(timeFormatter));
+
+            BigDecimal valor = new BigDecimal(valorStr);
+            PrecoRequest req = new PrecoRequest(valor, dataAtual, horaAtual);
+
             int linhaSelecionada = table.getSelectedRow();
 
             SwingWorker<Void, Void> worker = new SwingWorker<>() {
                 @Override
                 protected Void doInBackground() throws Exception {
-                    try {
-                        System.out.println("=== Enviando para backend ===");
-                        System.out.println("Valor: " + req.valor());
-                        System.out.println("Data: " + req.dataAlteracao());
-                        System.out.println("Hora: " + req.horaAlteracao());
-
-                        if (linhaSelecionada >= 0) {
-                            Object idObj = tableModel.getValueAt(linhaSelecionada, 0);
-                            long id = idObj instanceof Number ? ((Number) idObj).longValue() : Long.parseLong(String.valueOf(idObj));
-                            restTemplate.put(API_URL + "/" + id, req);
-                        } else {
-                            restTemplate.postForEntity(API_URL, req, PrecoResponse.class);
-                        }
-                    } catch (Exception ex) {
-                        System.err.println("ERRO DETALHADO:");
-                        System.err.println("Tipo: " + ex.getClass().getName());
-                        System.err.println("Mensagem: " + ex.getMessage());
-                        ex.printStackTrace();
-                        throw ex;
+                    if (linhaSelecionada >= 0) {
+                        Object idObj = tableModel.getValueAt(linhaSelecionada, 0);
+                        long id = idObj instanceof Number ? ((Number) idObj).longValue() : Long.parseLong(String.valueOf(idObj));
+                        restTemplate.put(API_URL + "/" + id, req);
+                    } else {
+                        restTemplate.postForEntity(API_URL, req, PrecoResponse.class);
                     }
                     return null;
                 }
 
                 @Override
                 protected void done() {
-                    try {
-                        get();
-                        JOptionPane.showMessageDialog(
-                                TelaPrecoCrud.this,
-                                "Preço salvo com sucesso!",
-                                "Sucesso",
-                                JOptionPane.INFORMATION_MESSAGE
-                        );
-                        carregarPrecos();
-                        limparFormulario();
-                    } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(
-                                TelaPrecoCrud.this,
-                                "Erro ao salvar: " + ex.getMessage(),
-                                "Erro",
-                                JOptionPane.ERROR_MESSAGE
-                        );
-                    }
+                    JOptionPane.showMessageDialog(
+                            TelaPrecoCrud.this,
+                            "Preço salvo com sucesso!",
+                            "Sucesso",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+                    carregarPrecos();
+                    limparFormulario();
                 }
             };
             worker.execute();
@@ -309,36 +281,20 @@ public class TelaPrecoCrud extends JPanel {
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
             protected Void doInBackground() throws Exception {
-                try {
-                    restTemplate.delete(API_URL + "/" + id);
-                } catch (Exception ex) {
-                    System.err.println("Erro ao excluir: " + ex.getMessage());
-                    ex.printStackTrace();
-                    throw ex;
-                }
+                restTemplate.delete(API_URL + "/" + id);
                 return null;
             }
 
             @Override
             protected void done() {
-                try {
-                    get();
-                    JOptionPane.showMessageDialog(
-                            TelaPrecoCrud.this,
-                            "Preço excluído com sucesso!",
-                            "Sucesso",
-                            JOptionPane.INFORMATION_MESSAGE
-                    );
-                    carregarPrecos();
-                    limparFormulario();
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(
-                            TelaPrecoCrud.this,
-                            "Erro ao excluir: " + ex.getMessage(),
-                            "Erro",
-                            JOptionPane.ERROR_MESSAGE
-                    );
-                }
+                JOptionPane.showMessageDialog(
+                        TelaPrecoCrud.this,
+                        "Preço excluído com sucesso!",
+                        "Sucesso",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+                carregarPrecos();
+                limparFormulario();
             }
         };
         worker.execute();
@@ -347,8 +303,13 @@ public class TelaPrecoCrud extends JPanel {
     private void limparFormulario() {
         table.clearSelection();
         txtValor.setText("");
-        txtDataAlteracao.setText("");
-        txtHoraAlteracao.setText("");
+
+
+        LocalDate hoje = LocalDate.now();
+        LocalTime agora = LocalTime.now();
+        txtDataAlteracao.setText(hoje.format(dateFormatter));
+        txtHoraAlteracao.setText(agora.format(timeFormatter));
+
         txtValor.requestFocus();
     }
 }

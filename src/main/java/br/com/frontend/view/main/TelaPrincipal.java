@@ -52,16 +52,16 @@ public class TelaPrincipal extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // Barra superior
+        //superior
         JPanel topPanel = createTopPanel();
         add(topPanel, BorderLayout.NORTH);
 
-        // TabbedPane para múltiplas abas
+        //abas
         tabbedPane = new JTabbedPane();
         tabbedPane.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         tabbedPane.setTabPlacement(JTabbedPane.TOP);
 
-        // Aba inicial: Painel de Bombas
+        //painel de Bombas
         painelBombas = new JPanel();
         painelBombas.setLayout(new BorderLayout(10, 10));
         painelBombas.setBackground(new Color(236, 240, 241));
@@ -83,12 +83,12 @@ public class TelaPrincipal extends JFrame {
         topPanel.setBackground(new Color(52, 73, 94));
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        // Título
+
         JLabel lblTitulo = new JLabel("🏪 PDV - Posto de Combustível");
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
         lblTitulo.setForeground(Color.WHITE);
 
-        // Usuário logado
+
         lblUsuario = new JLabel();
         lblUsuario.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         lblUsuario.setForeground(Color.WHITE);
@@ -104,7 +104,7 @@ public class TelaPrincipal extends JFrame {
         wrapper.setBackground(new Color(236, 240, 241));
         wrapper.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Título e botão de cadastro
+
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(new Color(236, 240, 241));
 
@@ -125,7 +125,7 @@ public class TelaPrincipal extends JFrame {
         headerPanel.add(lblTituloBombas, BorderLayout.WEST);
         headerPanel.add(btnCadastrarBomba, BorderLayout.EAST);
 
-        // Grid de bombas
+
         JPanel gridBombas = new JPanel(new GridLayout(0, 3, 20, 20));
         gridBombas.setBackground(new Color(236, 240, 241));
 
@@ -140,7 +140,6 @@ public class TelaPrincipal extends JFrame {
         menuBar.setBackground(new Color(44, 62, 80));
         menuBar.setBorderPainted(false);
 
-        // Menu Gestão (apenas admin)
         if (usuarioLogado.tipoAcesso() == TipoAcesso.ADMINISTRADOR) {
             JMenu menuGestao = criarMenu("Gestão");
             JMenuItem itemEstoque = criarMenuItem("📦 Estoque", e -> abrirAbaEstoque());
@@ -149,7 +148,7 @@ public class TelaPrincipal extends JFrame {
             menuGestao.add(itemCusto);
             menuBar.add(menuGestao);
 
-            // Menu Usuários
+
             JMenu menuUsuarios = criarMenu("Usuários");
             JMenuItem itemPessoas = criarMenuItem("👤 Pessoas", e -> abrirAba("Pessoas", context.getBean(TelaPessoaCrud.class)));
             JMenuItem itemContatos = criarMenuItem("📞 Contatos", e -> abrirAba("Contatos", context.getBean(TelaContatoCrud.class)));
@@ -159,7 +158,7 @@ public class TelaPrincipal extends JFrame {
             menuUsuarios.add(itemAcessos);
             menuBar.add(menuUsuarios);
 
-            // Menu Produtos e Preços
+
             JMenu menuProdutos = criarMenu("Produtos");
             JMenuItem itemProdutos = criarMenuItem("🛢️ Produtos", e -> abrirAba("Produtos", context.getBean(TelaProdutoCrud.class)));
             JMenuItem itemPrecos = criarMenuItem("💵 Preços", e -> abrirAba("Preços", context.getBean(TelaPrecoCrud.class)));
@@ -168,7 +167,7 @@ public class TelaPrincipal extends JFrame {
             menuBar.add(menuProdutos);
         }
 
-        // Menu Sair (todos)
+
         menuBar.add(Box.createHorizontalGlue());
         JMenu menuSair = criarMenu("❌ Sair");
         menuSair.addMenuListener(new javax.swing.event.MenuListener() {
@@ -209,7 +208,11 @@ public class TelaPrincipal extends JFrame {
         return item;
     }
 
+<<<<<<< HEAD
     // ✅ Método específico para abrir a aba de estoque e guardar referência
+=======
+
+>>>>>>> 2e79728 (atualizações finais)
     private void abrirAbaEstoque() {
         // Verifica se já está aberta
         if (abasAbertas.containsKey("Estoque")) {
@@ -218,38 +221,42 @@ public class TelaPrincipal extends JFrame {
             return;
         }
 
+<<<<<<< HEAD
         // Obtém ou cria a instância da tela de estoque
+=======
+
+>>>>>>> 2e79728 (atualizações finais)
         telaEstoqueCrud = context.getBean(TelaEstoqueCrud.class);
         abrirAba("Estoque", telaEstoqueCrud);
     }
 
     private void abrirAba(String titulo, Object telaBean) {
-        // Verifica se a aba já está aberta
+
         if (abasAbertas.containsKey(titulo)) {
             java.awt.Component component = abasAbertas.get(titulo);
             tabbedPane.setSelectedComponent(component);
             return;
         }
 
-        // Converte o bean para JPanel
+
         JPanel tela = (JPanel) telaBean;
 
-        // Inicializa o painel se tiver método init()
+
         try {
             tela.getClass().getMethod("init").invoke(tela);
         } catch (Exception e) {
             // Se não tiver init(), ignora
         }
 
-        // Cria wrapper com botão de fechar
+
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.add(tela, BorderLayout.CENTER);
 
-        // Adiciona a aba
+
         tabbedPane.addTab(titulo, wrapper);
         abasAbertas.put(titulo, wrapper);
 
-        // Cria componente customizado para o tab com botão de fechar
+
         int index = tabbedPane.indexOfComponent(wrapper);
         JPanel tabComponent = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         tabComponent.setOpaque(false);
@@ -270,7 +277,7 @@ public class TelaPrincipal extends JFrame {
         tabComponent.add(btnFechar);
         tabbedPane.setTabComponentAt(index, tabComponent);
 
-        // Seleciona a nova aba
+
         tabbedPane.setSelectedComponent(wrapper);
     }
 
@@ -327,7 +334,7 @@ public class TelaPrincipal extends JFrame {
                 try {
                     List<BombaResponse> bombas = get();
 
-                    // Pega o grid de bombas
+
                     JPanel wrapper = (JPanel) painelBombas.getComponent(0);
                     JPanel gridBombas = (JPanel) wrapper.getComponent(1);
                     gridBombas.removeAll();
@@ -368,7 +375,7 @@ public class TelaPrincipal extends JFrame {
                 BorderFactory.createEmptyBorder(20, 20, 20, 20)
         ));
 
-        // Cor baseada no status
+
         Color corFundo;
         Color corBorda;
         switch (bomba.tipoBomba()) {
@@ -395,17 +402,17 @@ public class TelaPrincipal extends JFrame {
                 BorderFactory.createEmptyBorder(20, 20, 20, 20)
         ));
 
-        // Número da bomba
+
         JLabel lblNumero = new JLabel("BOMBA " + bomba.numero(), SwingConstants.CENTER);
         lblNumero.setFont(new Font("Segoe UI", Font.BOLD, 28));
         lblNumero.setForeground(new Color(52, 73, 94));
 
-        // Status
+
         JLabel lblStatus = new JLabel(bomba.tipoBomba().toString(), SwingConstants.CENTER);
         lblStatus.setFont(new Font("Segoe UI", Font.PLAIN, 16));
         lblStatus.setForeground(new Color(127, 140, 141));
 
-        // Botão
+
         JButton btnSelecionar = new JButton("SELECIONAR");
         btnSelecionar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnSelecionar.setPreferredSize(new Dimension(0, 45));
@@ -432,7 +439,11 @@ public class TelaPrincipal extends JFrame {
     private void abrirTelaVenda(BombaResponse bomba) {
         TelaVenda telaVenda = new TelaVenda(bomba, usuarioLogado, this);
 
+<<<<<<< HEAD
         // ✅ CONEXÃO DO LISTENER: Se a tela de estoque estiver aberta, atualiza após venda
+=======
+
+>>>>>>> 2e79728 (atualizações finais)
         if (telaEstoqueCrud != null) {
             telaVenda.setEstoqueUpdateListener(() -> {
                 System.out.println("🔄 Atualizando estoque após venda...");

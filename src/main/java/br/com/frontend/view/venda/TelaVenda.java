@@ -20,12 +20,17 @@ public class TelaVenda extends JFrame {
     private final BombaResponse bomba;
     private final AcessoResponse usuario;
     private final TelaPrincipal telaPrincipal;
+<<<<<<< HEAD
     private EstoqueUpdateListener estoqueUpdateListener; // ✅ NOVO
+=======
+    private EstoqueUpdateListener estoqueUpdateListener;
+>>>>>>> 2e79728 (atualizações finais)
 
     private JComboBox<ProdutoResponse> cbProduto;
     private JTextField txtLitros;
     private JLabel lblValorUnitario;
     private JLabel lblValorTotal;
+    private JComboBox<String> cbFormaPagamento;
     private JButton btnConfirmar;
     private JButton btnCancelar;
 
@@ -39,14 +44,17 @@ public class TelaVenda extends JFrame {
         carregarProdutos();
     }
 
+<<<<<<< HEAD
     // ✅ NOVO MÉTODO - Permite registrar listener
+=======
+>>>>>>> 2e79728 (atualizações finais)
     public void setEstoqueUpdateListener(EstoqueUpdateListener listener) {
         this.estoqueUpdateListener = listener;
     }
 
     private void initComponents() {
         setTitle("Venda - Bomba " + bomba.numero());
-        setSize(600, 500);
+        setSize(600, 550);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
@@ -56,7 +64,7 @@ public class TelaVenda extends JFrame {
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         mainPanel.setBackground(Color.WHITE);
 
-        // Topo - Informações da bomba
+
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(new Color(52, 152, 219));
         topPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
@@ -72,7 +80,7 @@ public class TelaVenda extends JFrame {
         topPanel.add(lblBomba, BorderLayout.WEST);
         topPanel.add(lblUsuario, BorderLayout.EAST);
 
-        // Centro - Formulário
+
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(Color.WHITE);
         GridBagConstraints gbc = new GridBagConstraints();
@@ -131,7 +139,6 @@ public class TelaVenda extends JFrame {
         // Valor Unitário
         gbc.gridx = 0;
         gbc.gridy = 2;
-        gbc.weightx = 0;
         JLabel lblValorUnitTxt = new JLabel("Valor Unitário:");
         lblValorUnitTxt.setFont(new Font("Segoe UI", Font.BOLD, 14));
         formPanel.add(lblValorUnitTxt, gbc);
@@ -155,6 +162,21 @@ public class TelaVenda extends JFrame {
         lblValorTotal.setForeground(new Color(46, 204, 113));
         formPanel.add(lblValorTotal, gbc);
 
+        // Forma de Pagamento
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        JLabel lblForma = new JLabel("Forma de Pagamento:");
+        lblForma.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        formPanel.add(lblForma, gbc);
+
+        gbc.gridx = 1;
+        cbFormaPagamento = new JComboBox<>(new String[]{
+                "Dinheiro", "Cartão de Crédito", "Cartão de Débito", "Pix"
+        });
+        cbFormaPagamento.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        cbFormaPagamento.setPreferredSize(new Dimension(300, 35));
+        formPanel.add(cbFormaPagamento, gbc);
+
         // Botões
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         buttonPanel.setBackground(Color.WHITE);
@@ -166,7 +188,6 @@ public class TelaVenda extends JFrame {
         btnCancelar.setForeground(Color.WHITE);
         btnCancelar.setFocusPainted(false);
         btnCancelar.setBorderPainted(false);
-        btnCancelar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnCancelar.addActionListener(e -> cancelar());
 
         btnConfirmar = new JButton("CONFIRMAR VENDA");
@@ -176,7 +197,6 @@ public class TelaVenda extends JFrame {
         btnConfirmar.setForeground(Color.WHITE);
         btnConfirmar.setFocusPainted(false);
         btnConfirmar.setBorderPainted(false);
-        btnConfirmar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnConfirmar.addActionListener(e -> confirmarVenda());
 
         buttonPanel.add(btnCancelar);
@@ -202,14 +222,9 @@ public class TelaVenda extends JFrame {
                 try {
                     List<ProdutoResponse> produtos = get();
                     cbProduto.removeAllItems();
-                    for (ProdutoResponse p : produtos) {
-                        cbProduto.addItem(p);
-                    }
-                    if (!produtos.isEmpty()) {
-                        atualizarPreco();
-                    }
+                    for (ProdutoResponse p : produtos) cbProduto.addItem(p);
+                    if (!produtos.isEmpty()) atualizarPreco();
                 } catch (Exception ex) {
-                    ex.printStackTrace();
                     JOptionPane.showMessageDialog(TelaVenda.this, "Erro ao carregar produtos");
                 }
             }
@@ -225,18 +240,14 @@ public class TelaVenda extends JFrame {
             @Override
             protected PrecoResponse doInBackground() throws Exception {
                 try {
-                    PrecoResponse preco = restTemplate.getForObject(
-                            API_PRECOS + "/" + produtoSelecionado.id(),
-                            PrecoResponse.class
-                    );
-                    return preco;
+                    return restTemplate.getForObject(API_PRECOS + "/" + produtoSelecionado.id(), PrecoResponse.class);
                 } catch (Exception e) {
+<<<<<<< HEAD
                     System.err.println("Preço específico não encontrado, usando preço geral");
+=======
+>>>>>>> 2e79728 (atualizações finais)
                     PrecoResponse[] precos = restTemplate.getForObject(API_PRECOS, PrecoResponse[].class);
-                    if (precos != null && precos.length > 0) {
-                        return precos[precos.length - 1];
-                    }
-                    return null;
+                    return (precos != null && precos.length > 0) ? precos[precos.length - 1] : null;
                 }
             }
 
@@ -261,13 +272,11 @@ public class TelaVenda extends JFrame {
     private void calcularTotal() {
         try {
             if (precoAtual == null) return;
-
             String litrosStr = txtLitros.getText().trim().replace(",", ".");
             if (litrosStr.isEmpty()) {
                 lblValorTotal.setText("R$ 0,00");
                 return;
             }
-
             BigDecimal litros = new BigDecimal(litrosStr);
             BigDecimal total = precoAtual.valor().multiply(litros);
             lblValorTotal.setText(String.format("R$ %.2f", total));
@@ -280,7 +289,6 @@ public class TelaVenda extends JFrame {
         try {
             ProdutoResponse produto = (ProdutoResponse) cbProduto.getSelectedItem();
             String litrosStr = txtLitros.getText().trim().replace(",", ".");
-
             if (produto == null || litrosStr.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Preencha todos os campos!");
                 return;
@@ -293,7 +301,6 @@ public class TelaVenda extends JFrame {
             }
 
             VendaRequest req = new VendaRequest(bomba.id(), produto.id(), litros, usuario.usuario());
-
             btnConfirmar.setEnabled(false);
             btnConfirmar.setText("Processando...");
 
@@ -307,6 +314,7 @@ public class TelaVenda extends JFrame {
                 protected void done() {
                     try {
                         VendaResponse venda = get();
+<<<<<<< HEAD
 
                         // ✅ NOTIFICA QUE O ESTOQUE FOI ATUALIZADO
                         if (estoqueUpdateListener != null) {
@@ -318,9 +326,37 @@ public class TelaVenda extends JFrame {
                                 String.format("Venda realizada com sucesso!\nTotal: R$ %.2f", venda.valorTotal()),
                                 "Sucesso",
                                 JOptionPane.INFORMATION_MESSAGE
+=======
+                        if (estoqueUpdateListener != null) estoqueUpdateListener.onEstoqueAtualizado();
+
+                        String API_CUSTOS = "http://localhost:8080/api/v1/custos/" + produto.id();
+                        Double impostoPercentual = 0.0;
+                        try {
+                            var custo = restTemplate.getForObject(API_CUSTOS, br.com.frontend.dto.CustoResponse.class);
+                            if (custo != null && custo.imposto() != null) {
+                                impostoPercentual = custo.imposto();
+                            }
+                        } catch (Exception e) {
+                            System.err.println("Erro ao buscar imposto do custo: " + e.getMessage());
+                        }
+                        String formaPagamento = (String) cbFormaPagamento.getSelectedItem();
+
+                        TelaComprovante comprovante = new TelaComprovante(
+                                produto.nome(),
+                                precoAtual.valor().doubleValue(),
+                                litros.doubleValue(),
+                                precoAtual.valor().multiply(litros).doubleValue(),
+                                impostoPercentual.doubleValue(),
+                                formaPagamento
+>>>>>>> 2e79728 (atualizações finais)
                         );
+
+                        comprovante.setVisible(true);
+
+
                         voltar();
                     } catch (Exception ex) {
+<<<<<<< HEAD
                         ex.printStackTrace();
                         String errorMsg = ex.getMessage();
                         if (errorMsg != null && errorMsg.contains("Estoque insuficiente")) {
@@ -338,6 +374,9 @@ public class TelaVenda extends JFrame {
                                     JOptionPane.ERROR_MESSAGE
                             );
                         }
+=======
+                        JOptionPane.showMessageDialog(TelaVenda.this, "Erro ao realizar venda: " + ex.getMessage());
+>>>>>>> 2e79728 (atualizações finais)
                         btnConfirmar.setEnabled(true);
                         btnConfirmar.setText("CONFIRMAR VENDA");
                     }
@@ -350,16 +389,10 @@ public class TelaVenda extends JFrame {
         }
     }
 
+
     private void cancelar() {
-        int confirm = JOptionPane.showConfirmDialog(
-                this,
-                "Deseja cancelar esta venda?",
-                "Confirmar",
-                JOptionPane.YES_NO_OPTION
-        );
-        if (confirm == JOptionPane.YES_OPTION) {
-            voltar();
-        }
+        int confirm = JOptionPane.showConfirmDialog(this, "Deseja cancelar esta venda?", "Confirmar", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) voltar();
     }
 
     private void voltar() {

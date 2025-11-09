@@ -25,15 +25,17 @@ public class CustoService {
 
     public CustoResponse salvarCusto(CustoRequest request, Long id) {
         if (id == null) {
-            // Criar novo
+
             return restTemplate.postForObject(API_BASE_URL, request, CustoResponse.class);
         } else {
-            // Atualizar existente
+
             restTemplate.put(API_BASE_URL + "/" + id, request);
 
-            // ✅ CORRIGIDO: agora CustoResponse usa Date, não precisa converter
+
             return new CustoResponse(
                     id,
+                    request.produtoId(),
+                    null,
                     request.imposto(),
                     request.custoVariavel(),
                     request.custoFixo(),

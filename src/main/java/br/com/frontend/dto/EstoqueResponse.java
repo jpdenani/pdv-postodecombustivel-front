@@ -6,8 +6,8 @@ import java.util.Date;
 
 public record EstoqueResponse(
         Long id,
-        Long produtoId,           // ✅ ADICIONE
-        String nomeProduto,       // ✅ ADICIONE
+        Long produtoId,
+        String nomeProduto,
         BigDecimal quantidade,
         String localTanque,
         String localEndereco,

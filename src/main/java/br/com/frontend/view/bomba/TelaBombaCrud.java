@@ -32,7 +32,7 @@ public class TelaBombaCrud extends JPanel {
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // ====== Tabela ======
+
         String[] colunas = {"ID", "Número", "Status"};
         tableModel = new DefaultTableModel(colunas, 0) {
             @Override
@@ -51,7 +51,7 @@ public class TelaBombaCrud extends JPanel {
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setRowHeight(25);
 
-        // Esconde a coluna ID
+
         table.getColumnModel().getColumn(0).setMinWidth(0);
         table.getColumnModel().getColumn(0).setMaxWidth(0);
         table.getColumnModel().getColumn(0).setWidth(0);
@@ -60,7 +60,7 @@ public class TelaBombaCrud extends JPanel {
         scrollPane.setBorder(BorderFactory.createTitledBorder("Lista de Bombas"));
         add(scrollPane, BorderLayout.CENTER);
 
-        // ====== Formulário ======
+
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBorder(BorderFactory.createTitledBorder("Dados da Bomba"));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -70,19 +70,19 @@ public class TelaBombaCrud extends JPanel {
         txtNumero = new JTextField(20);
         cbTipoBomba = new JComboBox<>(TipoBomba.values());
 
-        // Linha 0: Número
+
         gbc.gridx = 0; gbc.gridy = 0;
         formPanel.add(new JLabel("Número da Bomba:"), gbc);
         gbc.gridx = 1;
         formPanel.add(txtNumero, gbc);
 
-        // Linha 1: Status
+
         gbc.gridx = 0; gbc.gridy = 1;
         formPanel.add(new JLabel("Status:"), gbc);
         gbc.gridx = 1;
         formPanel.add(cbTipoBomba, gbc);
 
-        // Linha 2: Botões
+
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         btnNovo = new JButton("Novo");
         btnSalvar = new JButton("Salvar");
@@ -105,7 +105,7 @@ public class TelaBombaCrud extends JPanel {
 
         add(formPanel, BorderLayout.SOUTH);
 
-        // ====== Ações ======
+
         btnNovo.addActionListener(e -> limparFormulario());
         btnSalvar.addActionListener(e -> salvarOuAtualizar());
         btnExcluir.addActionListener(e -> excluirSelecionado());
@@ -115,11 +115,11 @@ public class TelaBombaCrud extends JPanel {
             }
         });
 
-        // Carrega dados ao iniciar
+
         carregarBombas();
     }
 
-    // ====== Carrega todas as bombas ======
+
     private void carregarBombas() {
         SwingWorker<List<BombaResponse>, Void> worker = new SwingWorker<>() {
             @Override
@@ -161,7 +161,7 @@ public class TelaBombaCrud extends JPanel {
         worker.execute();
     }
 
-    // ====== Preenche formulário ao selecionar ======
+
     private void preencherFormulario() {
         int linhaSelecionada = table.getSelectedRow();
         if (linhaSelecionada >= 0) {
@@ -180,7 +180,7 @@ public class TelaBombaCrud extends JPanel {
         }
     }
 
-    // ====== Salvar ou atualizar ======
+
     private void salvarOuAtualizar() {
         String numeroStr = txtNumero.getText().trim();
 
@@ -256,7 +256,7 @@ public class TelaBombaCrud extends JPanel {
         }
     }
 
-    // ====== Excluir ======
+
     private void excluirSelecionado() {
         int linhaSelecionada = table.getSelectedRow();
         if (linhaSelecionada < 0) {

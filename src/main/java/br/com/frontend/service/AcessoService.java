@@ -18,7 +18,7 @@ public class AcessoService {
         this.restTemplate = restTemplate;
     }
 
-    // Lista todos os acessos, ajustando page/size para o backend
+
     public List<AcessoResponse> listarAcessos() {
         int page = 0;          // página inicial
         int size = 100;        // ou maior se precisar de mais registros
@@ -33,7 +33,7 @@ public class AcessoService {
     }
 
 
-    // Salvar ou atualizar acesso
+
     public AcessoResponse salvarAcesso(AcessoRequest request, Long id) {
         if (id == null) {
             return restTemplate.postForObject(API_BASE_URL, request, AcessoResponse.class);
@@ -43,12 +43,12 @@ public class AcessoService {
         }
     }
 
-    // Excluir acesso
+
     public void excluirAcesso(Long id) {
         restTemplate.delete(API_BASE_URL + "/" + id);
     }
 
-    // Autenticação simples
+
     public boolean autenticar(String usuario, String senha) {
         return listarAcessos().stream()
                 .anyMatch(a -> a.usuario().equals(usuario) && a.senha().equals(senha));

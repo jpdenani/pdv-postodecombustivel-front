@@ -6,9 +6,7 @@ import java.util.function.Supplier;
 
 public class SwingWorkerUtils {
 
-    /**
-     * Executa uma tarefa em background e processa o resultado
-     */
+
     public static <T> void executeAsync(
             Supplier<T> backgroundTask,
             Consumer<T> onSuccess,
@@ -33,9 +31,7 @@ public class SwingWorkerUtils {
         worker.execute();
     }
 
-    /**
-     * Executa uma tarefa sem retorno
-     */
+
     public static void executeAsync(
             Runnable backgroundTask,
             Runnable onSuccess,

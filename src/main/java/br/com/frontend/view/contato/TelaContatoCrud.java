@@ -8,7 +8,9 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.MaskFormatter;
 import java.awt.*;
+import java.text.ParseException;
 import java.util.List;
 
 @Component
@@ -20,7 +22,7 @@ public class TelaContatoCrud extends JPanel {
     private JTable table;
     private DefaultTableModel tableModel;
 
-    private JTextField txtTelefone;
+    private JFormattedTextField txtTelefone;
     private JTextField txtEmail;
     private JTextField txtEndereco;
     private JButton btnSalvar;
@@ -32,18 +34,12 @@ public class TelaContatoCrud extends JPanel {
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // ====== Tabela ======
+
         String[] colunas = {"ID", "Telefone", "Email", "Endereço"};
         tableModel = new DefaultTableModel(colunas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
-            }
-
-            @Override
-            public Class<?> getColumnClass(int columnIndex) {
-                if (columnIndex == 0) return Long.class;
-                return String.class;
             }
         };
 
@@ -51,7 +47,7 @@ public class TelaContatoCrud extends JPanel {
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setRowHeight(25);
 
-        // Esconde a coluna ID
+
         table.getColumnModel().getColumn(0).setMinWidth(0);
         table.getColumnModel().getColumn(0).setMaxWidth(0);
         table.getColumnModel().getColumn(0).setWidth(0);
@@ -60,47 +56,47 @@ public class TelaContatoCrud extends JPanel {
         scrollPane.setBorder(BorderFactory.createTitledBorder("Lista de Contatos"));
         add(scrollPane, BorderLayout.CENTER);
 
-        // ====== Formulário ======
+
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBorder(BorderFactory.createTitledBorder("Dados do Contato"));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        txtTelefone = new JTextField(20);
+        try {
+            MaskFormatter telMask = new MaskFormatter("(##) #####-####");
+            telMask.setPlaceholderCharacter('_');
+            txtTelefone = new JFormattedTextField(telMask);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+
         txtEmail = new JTextField(20);
         txtEndereco = new JTextField(20);
 
-        // Linha 0: Telefone
+
         gbc.gridx = 0; gbc.gridy = 0;
         formPanel.add(new JLabel("Telefone:"), gbc);
         gbc.gridx = 1;
         formPanel.add(txtTelefone, gbc);
 
-        // Linha 1: Email
+
         gbc.gridx = 0; gbc.gridy = 1;
         formPanel.add(new JLabel("Email:"), gbc);
         gbc.gridx = 1;
         formPanel.add(txtEmail, gbc);
 
-        // Linha 2: Endereço
+
         gbc.gridx = 0; gbc.gridy = 2;
         formPanel.add(new JLabel("Endereço:"), gbc);
         gbc.gridx = 1;
         formPanel.add(txtEndereco, gbc);
 
-        // Linha 3: Botões
+
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         btnNovo = new JButton("Novo");
         btnSalvar = new JButton("Salvar");
         btnExcluir = new JButton("Excluir");
-
-        btnNovo.setBackground(new Color(76, 175, 80));
-        btnNovo.setForeground(Color.WHITE);
-        btnSalvar.setBackground(new Color(33, 150, 243));
-        btnSalvar.setForeground(Color.WHITE);
-        btnExcluir.setBackground(new Color(244, 67, 54));
-        btnExcluir.setForeground(Color.WHITE);
 
         buttonPanel.add(btnNovo);
         buttonPanel.add(btnSalvar);
@@ -112,33 +108,23 @@ public class TelaContatoCrud extends JPanel {
 
         add(formPanel, BorderLayout.SOUTH);
 
-        // ====== Ações ======
+
         btnNovo.addActionListener(e -> limparFormulario());
         btnSalvar.addActionListener(e -> salvarOuAtualizar());
         btnExcluir.addActionListener(e -> excluirSelecionado());
         table.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                preencherFormulario();
-            }
+            if (!e.getValueIsAdjusting()) preencherFormulario();
         });
 
-        // Carrega dados ao iniciar
         carregarContatos();
     }
 
-    // ====== Carrega todos os contatos ======
     private void carregarContatos() {
         SwingWorker<List<ContatoResponse>, Void> worker = new SwingWorker<>() {
             @Override
-            protected List<ContatoResponse> doInBackground() throws Exception {
-                try {
-                    ContatoResponse[] resp = restTemplate.getForObject(API_URL, ContatoResponse[].class);
-                    return resp != null ? List.of(resp) : List.of();
-                } catch (Exception ex) {
-                    System.err.println("Erro ao carregar contatos: " + ex.getMessage());
-                    ex.printStackTrace();
-                    return List.of();
-                }
+            protected List<ContatoResponse> doInBackground() {
+                ContatoResponse[] resp = restTemplate.getForObject(API_URL, ContatoResponse[].class);
+                return resp != null ? List.of(resp) : List.of();
             }
 
             @Override
@@ -149,27 +135,28 @@ public class TelaContatoCrud extends JPanel {
                     for (ContatoResponse c : contatos) {
                         tableModel.addRow(new Object[]{
                                 c.id(),
-                                c.telefone(),
+                                formatarTelefone(c.telefone()),
                                 c.email(),
                                 c.endereco()
                         });
                     }
-                } catch (Exception ex) {
-                    System.err.println("Erro ao processar contatos: " + ex.getMessage());
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(
-                            TelaContatoCrud.this,
-                            "Erro ao carregar contatos: " + ex.getMessage(),
-                            "Erro",
-                            JOptionPane.ERROR_MESSAGE
-                    );
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         };
         worker.execute();
     }
 
-    // ====== Preenche formulário ao selecionar ======
+    private String formatarTelefone(String tel) {
+        if (tel == null || tel.length() < 10) return tel;
+        tel = tel.replaceAll("\\D", "");
+        if (tel.length() == 11)
+            return tel.replaceFirst("(\\d{2})(\\d{5})(\\d{4})", "($1) $2-$3");
+        else
+            return tel.replaceFirst("(\\d{2})(\\d{4})(\\d{4})", "($1) $2-$3");
+    }
+
     private void preencherFormulario() {
         int linhaSelecionada = table.getSelectedRow();
         if (linhaSelecionada >= 0) {
@@ -179,138 +166,58 @@ public class TelaContatoCrud extends JPanel {
         }
     }
 
-    // ====== Salvar ou atualizar ======
     private void salvarOuAtualizar() {
-        String telefone = txtTelefone.getText().trim();
+        String telefone = txtTelefone.getText().replaceAll("\\D", "");
         String email = txtEmail.getText().trim();
         String endereco = txtEndereco.getText().trim();
 
         if (telefone.isEmpty() || email.isEmpty() || endereco.isEmpty()) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Por favor, preencha todos os campos!",
-                    "Validação",
-                    JOptionPane.WARNING_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this, "Preencha todos os campos!", "Validação", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        ContatoRequest req = new ContatoRequest(email, telefone, endereco);
+        ContatoRequest req = new ContatoRequest(telefone, email, endereco);
         int linhaSelecionada = table.getSelectedRow();
 
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
-            protected Void doInBackground() throws Exception {
-                try {
-                    if (linhaSelecionada >= 0) {
-                        // Atualizar
-                        Object idObj = tableModel.getValueAt(linhaSelecionada, 0);
-                        long id = idObj instanceof Number ? ((Number) idObj).longValue() : Long.parseLong(String.valueOf(idObj));
-                        restTemplate.put(API_URL + "/" + id, req);
-                    } else {
-                        // Novo
-                        restTemplate.postForEntity(API_URL, req, ContatoResponse.class);
-                    }
-                } catch (Exception ex) {
-                    System.err.println("Erro ao salvar: " + ex.getMessage());
-                    ex.printStackTrace();
-                    throw ex;
+            protected Void doInBackground() {
+                if (linhaSelecionada >= 0) {
+                    long id = Long.parseLong(String.valueOf(tableModel.getValueAt(linhaSelecionada, 0)));
+                    restTemplate.put(API_URL + "/" + id, req);
+                } else {
+                    restTemplate.postForEntity(API_URL, req, ContatoResponse.class);
                 }
                 return null;
             }
 
             @Override
             protected void done() {
-                try {
-                    get();
-                    JOptionPane.showMessageDialog(
-                            TelaContatoCrud.this,
-                            "Contato salvo com sucesso!",
-                            "Sucesso",
-                            JOptionPane.INFORMATION_MESSAGE
-                    );
-                    carregarContatos();
-                    limparFormulario();
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(
-                            TelaContatoCrud.this,
-                            "Erro ao salvar: " + ex.getMessage(),
-                            "Erro",
-                            JOptionPane.ERROR_MESSAGE
-                    );
-                }
+                JOptionPane.showMessageDialog(TelaContatoCrud.this, "Contato salvo com sucesso!");
+                carregarContatos();
+                limparFormulario();
             }
         };
         worker.execute();
     }
 
-    // ====== Excluir ======
     private void excluirSelecionado() {
         int linhaSelecionada = table.getSelectedRow();
         if (linhaSelecionada < 0) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Selecione um contato para excluir!",
-                    "Validação",
-                    JOptionPane.WARNING_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this, "Selecione um contato!", "Validação", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        int confirm = JOptionPane.showConfirmDialog(
-                this,
-                "Deseja realmente excluir este contato?",
-                "Confirmar Exclusão",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE
-        );
-
-        if (confirm != JOptionPane.YES_OPTION) return;
-
-        Object idObj = tableModel.getValueAt(linhaSelecionada, 0);
-        long id = idObj instanceof Number ? ((Number) idObj).longValue() : Long.parseLong(String.valueOf(idObj));
-
-        SwingWorker<Void, Void> worker = new SwingWorker<>() {
-            @Override
-            protected Void doInBackground() throws Exception {
-                try {
-                    restTemplate.delete(API_URL + "/" + id);
-                } catch (Exception ex) {
-                    System.err.println("Erro ao excluir: " + ex.getMessage());
-                    ex.printStackTrace();
-                    throw ex;
-                }
-                return null;
-            }
-
-            @Override
-            protected void done() {
-                try {
-                    get();
-                    JOptionPane.showMessageDialog(
-                            TelaContatoCrud.this,
-                            "Contato excluído com sucesso!",
-                            "Sucesso",
-                            JOptionPane.INFORMATION_MESSAGE
-                    );
-                    carregarContatos();
-                    limparFormulario();
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(
-                            TelaContatoCrud.this,
-                            "Erro ao excluir: " + ex.getMessage(),
-                            "Erro",
-                            JOptionPane.ERROR_MESSAGE
-                    );
-                }
-            }
-        };
-        worker.execute();
+        long id = Long.parseLong(String.valueOf(tableModel.getValueAt(linhaSelecionada, 0)));
+        restTemplate.delete(API_URL + "/" + id);
+        JOptionPane.showMessageDialog(this, "Contato excluído!");
+        carregarContatos();
+        limparFormulario();
     }
 
     private void limparFormulario() {
         table.clearSelection();
-        txtTelefone.setText("");
+        txtTelefone.setValue(null);
         txtEmail.setText("");
         txtEndereco.setText("");
         txtTelefone.requestFocus();

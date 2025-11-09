@@ -32,7 +32,7 @@ public class TelaLogin extends JFrame {
         setLocationRelativeTo(null);
         setResizable(false);
 
-        // Painel principal com gradiente
+
         JPanel mainPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -49,7 +49,7 @@ public class TelaLogin extends JFrame {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
 
-        // Painel do formulário
+
         JPanel formPanel = new JPanel();
         formPanel.setLayout(new GridBagLayout());
         formPanel.setBackground(Color.WHITE);
@@ -62,7 +62,7 @@ public class TelaLogin extends JFrame {
         formGbc.insets = new Insets(8, 8, 8, 8);
         formGbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Título
+
         JLabel lblTitulo = new JLabel("Sistema PDV");
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 28));
         lblTitulo.setForeground(new Color(52, 73, 94));
@@ -80,7 +80,7 @@ public class TelaLogin extends JFrame {
         formGbc.insets = new Insets(0, 8, 20, 8);
         formPanel.add(lblSubtitulo, formGbc);
 
-        // Usuário
+
         formGbc.gridwidth = 1;
         formGbc.insets = new Insets(8, 8, 8, 8);
         formGbc.gridy = 2;
@@ -99,7 +99,7 @@ public class TelaLogin extends JFrame {
         ));
         formPanel.add(txtUsuario, formGbc);
 
-        // Senha
+
         formGbc.gridy = 3;
         formGbc.gridx = 0;
         JLabel lblSenha = new JLabel("Senha:");
@@ -116,7 +116,7 @@ public class TelaLogin extends JFrame {
         ));
         formPanel.add(txtSenha, formGbc);
 
-        // Mensagem de erro
+
         formGbc.gridy = 4;
         formGbc.gridx = 0;
         formGbc.gridwidth = 2;
@@ -126,7 +126,7 @@ public class TelaLogin extends JFrame {
         lblMensagem.setHorizontalAlignment(SwingConstants.CENTER);
         formPanel.add(lblMensagem, formGbc);
 
-        // Botão Entrar
+
         formGbc.gridy = 5;
         formGbc.insets = new Insets(15, 8, 8, 8);
         btnEntrar = new JButton("ENTRAR");
@@ -139,18 +139,18 @@ public class TelaLogin extends JFrame {
         btnEntrar.setPreferredSize(new Dimension(0, 40));
         formPanel.add(btnEntrar, formGbc);
 
-        // Adiciona o painel do formulário ao painel principal
+
         gbc.gridx = 0;
         gbc.gridy = 0;
         mainPanel.add(formPanel, gbc);
 
         add(mainPanel);
 
-        // Ações
+
         btnEntrar.addActionListener(e -> realizarLogin());
         txtSenha.addActionListener(e -> realizarLogin());
 
-        // Foco inicial
+
         txtUsuario.requestFocus();
     }
 
@@ -171,7 +171,7 @@ public class TelaLogin extends JFrame {
             @Override
             protected AcessoResponse doInBackground() throws Exception {
                 try {
-                    // Busca todos os acessos e verifica
+
                     AcessoResponse[] acessos = restTemplate.getForObject(API_URL, AcessoResponse[].class);
 
                     if (acessos != null) {
@@ -194,12 +194,12 @@ public class TelaLogin extends JFrame {
                     AcessoResponse acesso = get();
 
                     if (acesso != null) {
-                        // Login bem-sucedido
+
                         telaPrincipal.setUsuarioLogado(acesso);
                         telaPrincipal.setVisible(true);
                         dispose();
                     } else {
-                        // Login falhou
+
                         lblMensagem.setText("Usuário ou senha incorretos!");
                         lblMensagem.setForeground(new Color(231, 76, 60));
                         txtSenha.setText("");

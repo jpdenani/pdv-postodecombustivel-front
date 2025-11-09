@@ -25,8 +25,8 @@ public class TelaPessoaCrud extends JPanel {
 
     private final JTextField txtId = new JTextField();
     private final JTextField txtNome = new JTextField();
-    private final JTextField txtCpfCnpj = new JTextField();
-    private final JTextField txtCtps = new JTextField();
+    private final JFormattedTextField txtCpfCnpj;
+    private final JFormattedTextField txtCtps;
     private final JFormattedTextField txtDataNascimento;
     private final JComboBox<TipoPessoa> comboTipoPessoa = new JComboBox<>(TipoPessoa.values());
 
@@ -34,13 +34,10 @@ public class TelaPessoaCrud extends JPanel {
         this.pessoaService = pessoaService;
 
         setLayout(new BorderLayout());
-
-        int padding = 15;
-        setBorder(new EmptyBorder(padding, padding, padding, padding));
-
+        setBorder(new EmptyBorder(15, 15, 15, 15));
         setBackground(Color.WHITE);
 
-        // --- Modelo da Tabela ---
+
         String[] columnNames = {"ID", "Nome Completo", "CPF/CNPJ", "CTPS", "Data Nasc.", "Tipo"};
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
@@ -51,32 +48,40 @@ public class TelaPessoaCrud extends JPanel {
         table = new JTable(tableModel);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        // --- Formulário ---
-        JPanel formPanel = new JPanel(new GridLayout(7, 2, 5, 5));
-        formPanel.setBorder(BorderFactory.createTitledBorder("Dados da Pessoa"));
-        txtId.setEditable(false);
 
         try {
+            MaskFormatter cpfMask = new MaskFormatter("###.###.###-##");
+            cpfMask.setPlaceholderCharacter('_');
+            txtCpfCnpj = new JFormattedTextField(cpfMask);
+
+            MaskFormatter ctpsMask = new MaskFormatter("#########-#");
+            ctpsMask.setPlaceholderCharacter('_');
+            txtCtps = new JFormattedTextField(ctpsMask);
+
             MaskFormatter dateMask = new MaskFormatter("##/##/####");
+            dateMask.setPlaceholderCharacter('_');
             txtDataNascimento = new JFormattedTextField(dateMask);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
 
-        formPanel.add(new JLabel("ID:"));
-        formPanel.add(txtId);
+
+        JPanel formPanel = new JPanel(new GridLayout(7, 2, 5, 5));
+        formPanel.setBorder(BorderFactory.createTitledBorder("Dados da Pessoa"));
+        txtId.setEditable(false);
+
         formPanel.add(new JLabel("Nome Completo:"));
         formPanel.add(txtNome);
-        formPanel.add(new JLabel("CPF/CNPJ:"));
+        formPanel.add(new JLabel("CPF:"));
         formPanel.add(txtCpfCnpj);
-        formPanel.add(new JLabel("Nº CTPS:"));
+        formPanel.add(new JLabel("CTPS:"));
         formPanel.add(txtCtps);
-        formPanel.add(new JLabel("Data Nascimento (dd/mm/aaaa):"));
+        formPanel.add(new JLabel("Data Nascimento:"));
         formPanel.add(txtDataNascimento);
         formPanel.add(new JLabel("Tipo de Pessoa:"));
         formPanel.add(comboTipoPessoa);
 
-        // --- Botões ---
+
         JButton btnSalvar = new JButton("Salvar");
         JButton btnExcluir = new JButton("Excluir");
         JButton btnLimpar = new JButton("Limpar");
@@ -86,16 +91,16 @@ public class TelaPessoaCrud extends JPanel {
         buttonPanel.add(btnExcluir);
         buttonPanel.add(btnLimpar);
 
-        // --- Painel Superior ---
+
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(formPanel, BorderLayout.CENTER);
         topPanel.add(buttonPanel, BorderLayout.SOUTH);
 
-        // --- Montagem da Tela ---
+
         add(topPanel, BorderLayout.NORTH);
         add(new JScrollPane(table), BorderLayout.CENTER);
 
-        // --- Ações ---
+
         btnSalvar.addActionListener(e -> salvar());
         btnExcluir.addActionListener(e -> excluir());
         btnLimpar.addActionListener(e -> limparFormulario());
@@ -119,17 +124,20 @@ public class TelaPessoaCrud extends JPanel {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
                     for (PessoaResponse p : pessoas) {
+                        String cpfFormatado = formatarCPF(p.cpfCnpj());
+                        String ctpsFormatado = formatarCTPS(p.numeroCtps());
+                        String dataFormatada = p.dataNascimento() != null ? p.dataNascimento().format(formatter) : "";
+
                         tableModel.addRow(new Object[]{
-                                p.id() != null ? p.id().toString() : "",
+                                p.id(),
                                 p.nomeCompleto(),
-                                p.cpfCnpj(),
-                                p.numeroCtps(),
-                                p.dataNascimento() != null ? p.dataNascimento().format(formatter) : "",
+                                cpfFormatado,
+                                ctpsFormatado,
+                                dataFormatada,
                                 p.tipoPessoa() != null ? p.tipoPessoa().name() : ""
                         });
                     }
 
-                    table.repaint();
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(TelaPessoaCrud.this,
                             "Erro ao buscar pessoas: " + e.getMessage(),
@@ -138,6 +146,17 @@ public class TelaPessoaCrud extends JPanel {
                 }
             }
         }.execute();
+    }
+
+    private String formatarCPF(String cpf) {
+        if (cpf == null || cpf.length() != 11) return cpf;
+        return cpf.replaceFirst("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4");
+    }
+
+    private String formatarCTPS(Long ctps) {
+        if (ctps == null) return "";
+        String str = String.format("%010d", ctps);
+        return str.replaceFirst("(\\d{9})(\\d)", "$1-$2");
     }
 
     private void salvar() {
@@ -155,16 +174,19 @@ public class TelaPessoaCrud extends JPanel {
             dataNascimento = LocalDate.parse(txtDataNascimento.getText(), formatter);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this,
-                    "Formato de data inválido. Use dd/mm/aaaa.",
+                    "Formato de data inválido.",
                     "Erro de Validação",
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
 
+        String cpfLimpo = txtCpfCnpj.getText().replaceAll("\\D", "");
+        String ctpsLimpo = txtCtps.getText().replaceAll("\\D", "");
+
         PessoaRequest request = new PessoaRequest(
                 txtNome.getText(),
-                txtCpfCnpj.getText(),
-                Long.parseLong(txtCtps.getText()),
+                cpfLimpo,
+                Long.parseLong(ctpsLimpo),
                 dataNascimento,
                 (TipoPessoa) comboTipoPessoa.getSelectedItem()
         );
@@ -218,11 +240,11 @@ public class TelaPessoaCrud extends JPanel {
     private void preencherFormularioComLinhaSelecionada() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow >= 0) {
-            txtId.setText(table.getValueAt(selectedRow, 0).toString());
-            txtNome.setText(table.getValueAt(selectedRow, 1).toString());
-            txtCpfCnpj.setText(table.getValueAt(selectedRow, 2).toString());
-            txtCtps.setText(table.getValueAt(selectedRow, 3).toString());
-            txtDataNascimento.setText(table.getValueAt(selectedRow, 4).toString());
+            txtId.setText(String.valueOf(table.getValueAt(selectedRow, 0)));
+            txtNome.setText(String.valueOf(table.getValueAt(selectedRow, 1)));
+            txtCpfCnpj.setText(String.valueOf(table.getValueAt(selectedRow, 2)));
+            txtCtps.setText(String.valueOf(table.getValueAt(selectedRow, 3)));
+            txtDataNascimento.setText(String.valueOf(table.getValueAt(selectedRow, 4)));
             comboTipoPessoa.setSelectedItem(TipoPessoa.valueOf(table.getValueAt(selectedRow, 5).toString()));
         }
     }

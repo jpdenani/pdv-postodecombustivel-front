@@ -31,7 +31,7 @@ public class EstoqueService {
         } else {
             restTemplate.put(API_BASE_URL + "/" + id, request);
 
-            // ✅ Converte String para Date
+
             Date dataValidade = null;
             try {
                 dataValidade = dateFormat.parse(request.dataValidade());
@@ -39,7 +39,7 @@ public class EstoqueService {
                 System.err.println("Erro ao converter data: " + e.getMessage());
             }
 
-            // ✅ AGORA COM 11 ARGUMENTOS
+
             return new EstoqueResponse(
                     id,                                      // 1. id
                     request.produtoId(),                     // 2. produtoId ✅ NOVO

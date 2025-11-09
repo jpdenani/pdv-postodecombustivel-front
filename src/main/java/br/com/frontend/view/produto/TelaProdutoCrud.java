@@ -36,7 +36,6 @@ public class TelaProdutoCrud extends JPanel {
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // ====== Tabela ======
         String[] colunas = {"ID", "Nome", "Referência", "Categoria", "Fornecedor", "Marca", "Tipo"};
         tableModel = new DefaultTableModel(colunas, 0) {
             @Override
@@ -55,7 +54,6 @@ public class TelaProdutoCrud extends JPanel {
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setRowHeight(25);
 
-        // Esconde a coluna ID
         table.getColumnModel().getColumn(0).setMinWidth(0);
         table.getColumnModel().getColumn(0).setMaxWidth(0);
         table.getColumnModel().getColumn(0).setWidth(0);
@@ -64,7 +62,6 @@ public class TelaProdutoCrud extends JPanel {
         scrollPane.setBorder(BorderFactory.createTitledBorder("Lista de Produtos"));
         add(scrollPane, BorderLayout.CENTER);
 
-        // ====== Formulário ======
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBorder(BorderFactory.createTitledBorder("Dados do Produto"));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -78,54 +75,40 @@ public class TelaProdutoCrud extends JPanel {
         txtMarca = new JTextField(20);
         cbTipoProduto = new JComboBox<>(TipoProduto.values());
 
-        // Linha 0: Nome
         gbc.gridx = 0; gbc.gridy = 0;
         formPanel.add(new JLabel("Nome:"), gbc);
         gbc.gridx = 1;
         formPanel.add(txtNome, gbc);
 
-        // Linha 1: Referência
         gbc.gridx = 0; gbc.gridy = 1;
         formPanel.add(new JLabel("Referência:"), gbc);
         gbc.gridx = 1;
         formPanel.add(txtReferencia, gbc);
 
-        // Linha 2: Categoria
         gbc.gridx = 0; gbc.gridy = 2;
         formPanel.add(new JLabel("Categoria:"), gbc);
         gbc.gridx = 1;
         formPanel.add(txtCategoria, gbc);
 
-        // Linha 3: Fornecedor
         gbc.gridx = 0; gbc.gridy = 3;
         formPanel.add(new JLabel("Fornecedor:"), gbc);
         gbc.gridx = 1;
         formPanel.add(txtFornecedor, gbc);
 
-        // Linha 4: Marca
         gbc.gridx = 0; gbc.gridy = 4;
         formPanel.add(new JLabel("Marca:"), gbc);
         gbc.gridx = 1;
         formPanel.add(txtMarca, gbc);
 
-        // Linha 5: Tipo Produto
         gbc.gridx = 0; gbc.gridy = 5;
         formPanel.add(new JLabel("Tipo de Produto:"), gbc);
         gbc.gridx = 1;
         formPanel.add(cbTipoProduto, gbc);
 
-        // Linha 6: Botões
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         btnNovo = new JButton("Novo");
         btnSalvar = new JButton("Salvar");
         btnExcluir = new JButton("Excluir");
-
-        btnNovo.setBackground(new Color(76, 175, 80));
-        btnNovo.setForeground(Color.WHITE);
-        btnSalvar.setBackground(new Color(33, 150, 243));
-        btnSalvar.setForeground(Color.WHITE);
-        btnExcluir.setBackground(new Color(244, 67, 54));
-        btnExcluir.setForeground(Color.WHITE);
 
         buttonPanel.add(btnNovo);
         buttonPanel.add(btnSalvar);
@@ -137,7 +120,7 @@ public class TelaProdutoCrud extends JPanel {
 
         add(formPanel, BorderLayout.SOUTH);
 
-        // ====== Ações ======
+
         btnNovo.addActionListener(e -> limparFormulario());
         btnSalvar.addActionListener(e -> salvarOuAtualizar());
         btnExcluir.addActionListener(e -> excluirSelecionado());
@@ -170,15 +153,15 @@ public class TelaProdutoCrud extends JPanel {
                     List<ProdutoResponse> produtos = get();
                     tableModel.setRowCount(0);
                     for (ProdutoResponse p : produtos) {
-                        // ✅ CORREÇÃO: Ordem correta dos campos na tabela
+
                         tableModel.addRow(new Object[]{
-                                p.id(),           // ID (coluna 0 - oculta)
-                                p.nome(),         // Nome (coluna 1)
-                                p.referencia(),   // Referência (coluna 2)
-                                p.marca(),        // MARCA (coluna 3) - CORRIGIDO
-                                p.fornecedor(),   // Fornecedor (coluna 4)
-                                p.categoria(),    // CATEGORIA (coluna 5) - CORRIGIDO
-                                p.tipoProduto()   // Tipo (coluna 6)
+                                p.id(),
+                                p.nome(),
+                                p.referencia(),
+                                p.marca(),
+                                p.fornecedor(),
+                                p.categoria(),
+                                p.tipoProduto()
                         });
                     }
                 } catch (Exception ex) {

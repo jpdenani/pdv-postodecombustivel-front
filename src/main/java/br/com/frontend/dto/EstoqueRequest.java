@@ -4,7 +4,7 @@ import br.com.frontend.enums.TipoEstoque;
 import java.math.BigDecimal;
 
 public record EstoqueRequest(
-        Long produtoId,           // ✅ ADICIONE
+        Long produtoId,
         BigDecimal quantidade,
         String localTanque,
         String localEndereco,

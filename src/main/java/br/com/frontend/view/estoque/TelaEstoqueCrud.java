@@ -28,7 +28,11 @@ public class TelaEstoqueCrud extends JPanel {
     private JTable table;
     private DefaultTableModel tableModel;
 
+<<<<<<< HEAD
     // ✅ ADICIONE ESTE CAMPO
+=======
+
+>>>>>>> 2e79728 (atualizações finais)
     private JComboBox<ProdutoResponse> cbProduto;
 
     private JTextField txtQuantidade;
@@ -48,7 +52,11 @@ public class TelaEstoqueCrud extends JPanel {
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+<<<<<<< HEAD
         // Tabela - ✅ ADICIONE COLUNA PRODUTO
+=======
+
+>>>>>>> 2e79728 (atualizações finais)
         String[] colunas = {"ID", "Produto", "Quantidade", "Capacidade", "%", "Tipo", "Tanque", "Endereço", "Lote", "Validade"};
         tableModel = new DefaultTableModel(colunas, 0) {
             @Override
@@ -61,6 +69,13 @@ public class TelaEstoqueCrud extends JPanel {
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setRowHeight(25);
 
+<<<<<<< HEAD
+=======
+        table.getColumnModel().getColumn(0).setMinWidth(0);
+        table.getColumnModel().getColumn(0).setMaxWidth(0);
+        table.getColumnModel().getColumn(0).setWidth(0);
+
+>>>>>>> 2e79728 (atualizações finais)
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
 
@@ -103,21 +118,33 @@ public class TelaEstoqueCrud extends JPanel {
 
         int row = 0;
 
+<<<<<<< HEAD
         // ✅ PRODUTO (NOVO CAMPO)
+=======
+
+>>>>>>> 2e79728 (atualizações finais)
         gbc.gridx = 0; gbc.gridy = row;
         formPanel.add(new JLabel("Produto:"), gbc);
         gbc.gridx = 1;
         formPanel.add(cbProduto, gbc);
         row++;
 
+<<<<<<< HEAD
         // Quantidade
+=======
+
+>>>>>>> 2e79728 (atualizações finais)
         gbc.gridx = 0; gbc.gridy = row;
         formPanel.add(new JLabel("Quantidade (litros):"), gbc);
         gbc.gridx = 1;
         formPanel.add(txtQuantidade, gbc);
         row++;
 
+<<<<<<< HEAD
         // Capacidade Máxima
+=======
+
+>>>>>>> 2e79728 (atualizações finais)
         gbc.gridx = 0; gbc.gridy = row;
         formPanel.add(new JLabel("Capacidade Máxima:"), gbc);
         gbc.gridx = 1;
@@ -125,7 +152,11 @@ public class TelaEstoqueCrud extends JPanel {
         formPanel.add(lblCapacidadeMaxima, gbc);
         row++;
 
+<<<<<<< HEAD
         // Percentual
+=======
+
+>>>>>>> 2e79728 (atualizações finais)
         gbc.gridx = 0; gbc.gridy = row;
         formPanel.add(new JLabel("Percentual:"), gbc);
         gbc.gridx = 1;
@@ -133,7 +164,11 @@ public class TelaEstoqueCrud extends JPanel {
         formPanel.add(lblPercentual, gbc);
         row++;
 
+<<<<<<< HEAD
         // Tipo Estoque
+=======
+
+>>>>>>> 2e79728 (atualizações finais)
         gbc.gridx = 0; gbc.gridy = row;
         formPanel.add(new JLabel("Tipo Estoque:"), gbc);
         gbc.gridx = 1;
@@ -141,46 +176,39 @@ public class TelaEstoqueCrud extends JPanel {
         formPanel.add(lblTipoEstoque, gbc);
         row++;
 
-        // Tanque
+
         gbc.gridx = 0; gbc.gridy = row;
         formPanel.add(new JLabel("Local Tanque:"), gbc);
         gbc.gridx = 1;
         formPanel.add(txtTanque, gbc);
         row++;
 
-        // Endereço
+
         gbc.gridx = 0; gbc.gridy = row;
         formPanel.add(new JLabel("Local Endereço:"), gbc);
         gbc.gridx = 1;
         formPanel.add(txtEndereco, gbc);
         row++;
 
-        // Lote
+
         gbc.gridx = 0; gbc.gridy = row;
         formPanel.add(new JLabel("Lote Fabricação:"), gbc);
         gbc.gridx = 1;
         formPanel.add(txtLote, gbc);
         row++;
 
-        // Data Validade
+
         gbc.gridx = 0; gbc.gridy = row;
         formPanel.add(new JLabel("Data Validade:"), gbc);
         gbc.gridx = 1;
         formPanel.add(txtDataValidade, gbc);
         row++;
 
-        // Botões
+        //botões
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         btnNovo = new JButton("Novo");
         btnSalvar = new JButton("Salvar");
         btnExcluir = new JButton("Excluir");
-
-        btnNovo.setBackground(new Color(76, 175, 80));
-        btnNovo.setForeground(Color.WHITE);
-        btnSalvar.setBackground(new Color(33, 150, 243));
-        btnSalvar.setForeground(Color.WHITE);
-        btnExcluir.setBackground(new Color(244, 67, 54));
-        btnExcluir.setForeground(Color.WHITE);
 
         buttonPanel.add(btnNovo);
         buttonPanel.add(btnSalvar);
@@ -192,7 +220,11 @@ public class TelaEstoqueCrud extends JPanel {
 
         add(formPanel, BorderLayout.SOUTH);
 
+<<<<<<< HEAD
         // Ações
+=======
+        //ações
+>>>>>>> 2e79728 (atualizações finais)
         btnNovo.addActionListener(e -> limparFormulario());
         btnSalvar.addActionListener(e -> salvarOuAtualizar());
         btnExcluir.addActionListener(e -> excluirSelecionado());
@@ -208,12 +240,20 @@ public class TelaEstoqueCrud extends JPanel {
             }
         });
 
+<<<<<<< HEAD
         // ✅ CARREGA PRODUTOS E ESTOQUES
+=======
+
+>>>>>>> 2e79728 (atualizações finais)
         carregarProdutos();
         carregarEstoques();
     }
 
+<<<<<<< HEAD
     // ✅ NOVO MÉTODO - Carrega produtos no combo
+=======
+
+>>>>>>> 2e79728 (atualizações finais)
     private void carregarProdutos() {
         SwingWorker<List<ProdutoResponse>, Void> worker = new SwingWorker<>() {
             @Override
@@ -294,7 +334,11 @@ public class TelaEstoqueCrud extends JPanel {
                     return resp != null ? List.of(resp) : List.of();
                 } catch (Exception ex) {
                     System.err.println("Erro ao carregar estoques: " + ex.getMessage());
+<<<<<<< HEAD
                     ex.printStackTrace(); // ✅ Mostra erro completo
+=======
+                    ex.printStackTrace();
+>>>>>>> 2e79728 (atualizações finais)
                     return List.of();
                 }
             }
@@ -305,7 +349,11 @@ public class TelaEstoqueCrud extends JPanel {
                     List<EstoqueResponse> estoques = get();
                     tableModel.setRowCount(0);
                     for (EstoqueResponse est : estoques) {
+<<<<<<< HEAD
                         // ✅ Debug: imprime para verificar se o nome vem do backend
+=======
+
+>>>>>>> 2e79728 (atualizações finais)
                         System.out.println("Estoque ID: " + est.id() +
                                 ", Produto: " + est.nomeProduto() +
                                 ", Qtd: " + est.quantidade());
@@ -340,6 +388,7 @@ public class TelaEstoqueCrud extends JPanel {
     private void preencherFormulario() {
         int linhaSelecionada = table.getSelectedRow();
         if (linhaSelecionada >= 0) {
+<<<<<<< HEAD
             // ✅ Seleciona o produto correto no combo
             String nomeProduto = String.valueOf(tableModel.getValueAt(linhaSelecionada, 1));
             for (int i = 0; i < cbProduto.getItemCount(); i++) {
@@ -356,10 +405,48 @@ public class TelaEstoqueCrud extends JPanel {
             txtEndereco.setText(String.valueOf(tableModel.getValueAt(linhaSelecionada, 7)));
             txtLote.setText(String.valueOf(tableModel.getValueAt(linhaSelecionada, 8)));
             txtDataValidade.setText(String.valueOf(tableModel.getValueAt(linhaSelecionada, 9)));
+=======
+            Long idEstoque = Long.parseLong(tableModel.getValueAt(linhaSelecionada, 0).toString());
+>>>>>>> 2e79728 (atualizações finais)
 
-            atualizarInfosCalculadas();
+            try {
+
+                EstoqueResponse est = restTemplate.getForObject(API_URL + "/" + idEstoque, EstoqueResponse.class);
+                if (est != null) {
+                    // Seleciona produto no combo
+                    for (int i = 0; i < cbProduto.getItemCount(); i++) {
+                        ProdutoResponse p = cbProduto.getItemAt(i);
+                        if (p.nome().equals(est.nomeProduto())) {
+                            cbProduto.setSelectedIndex(i);
+                            break;
+                        }
+                    }
+
+                    // Preenche campos com o dado atualizado
+                    txtQuantidade.setText(est.quantidade().toString());
+                    txtTanque.setText(est.localTanque());
+                    txtEndereco.setText(est.localEndereco());
+                    txtLote.setText(est.loteFabricacao());
+                    txtDataValidade.setText(dateFormat.format(est.dataValidade()));
+
+                    lblCapacidadeMaxima.setText(est.capacidadeMaxima() + " litros");
+                    lblPercentual.setText(est.percentualEstoque() + "%");
+                    lblTipoEstoque.setText(est.tipoEstoque().getDescricao());
+                }
+
+                atualizarInfosCalculadas();
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Erro ao buscar estoque atualizado: " + ex.getMessage(),
+                        "Erro",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
         }
     }
+
 
     private void salvarOuAtualizar() {
         try {
