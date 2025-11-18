@@ -37,7 +37,6 @@ public class TelaPrincipal extends JFrame {
     private JMenuBar menuBar;
     private Map<String, java.awt.Component> abasAbertas = new HashMap<>();
 
-    // ✅ Referência para a tela de estoque (para atualizar após vendas)
     private TelaEstoqueCrud telaEstoqueCrud;
 
     public TelaPrincipal(ApplicationContext context) {
@@ -140,6 +139,11 @@ public class TelaPrincipal extends JFrame {
         menuBar.setBackground(new Color(44, 62, 80));
         menuBar.setBorderPainted(false);
 
+        /*
+
+
+        permissões
+         */
         if (usuarioLogado.tipoAcesso() == TipoAcesso.ADMINISTRADOR) {
             JMenu menuGestao = criarMenu("Gestão");
             JMenuItem itemEstoque = criarMenuItem("📦 Estoque", e -> abrirAbaEstoque());
@@ -208,27 +212,20 @@ public class TelaPrincipal extends JFrame {
         return item;
     }
 
-<<<<<<< HEAD
-    // ✅ Método específico para abrir a aba de estoque e guardar referência
-=======
-
->>>>>>> 2e79728 (atualizações finais)
     private void abrirAbaEstoque() {
-        // Verifica se já está aberta
         if (abasAbertas.containsKey("Estoque")) {
             java.awt.Component component = abasAbertas.get("Estoque");
             tabbedPane.setSelectedComponent(component);
             return;
         }
 
-<<<<<<< HEAD
-        // Obtém ou cria a instância da tela de estoque
-=======
+        if (telaEstoqueCrud == null) {
+            telaEstoqueCrud = context.getBean(TelaEstoqueCrud.class);
+        }
 
->>>>>>> 2e79728 (atualizações finais)
-        telaEstoqueCrud = context.getBean(TelaEstoqueCrud.class);
         abrirAba("Estoque", telaEstoqueCrud);
     }
+
 
     private void abrirAba(String titulo, Object telaBean) {
 
@@ -439,11 +436,7 @@ public class TelaPrincipal extends JFrame {
     private void abrirTelaVenda(BombaResponse bomba) {
         TelaVenda telaVenda = new TelaVenda(bomba, usuarioLogado, this);
 
-<<<<<<< HEAD
-        // ✅ CONEXÃO DO LISTENER: Se a tela de estoque estiver aberta, atualiza após venda
-=======
 
->>>>>>> 2e79728 (atualizações finais)
         if (telaEstoqueCrud != null) {
             telaVenda.setEstoqueUpdateListener(() -> {
                 System.out.println("🔄 Atualizando estoque após venda...");

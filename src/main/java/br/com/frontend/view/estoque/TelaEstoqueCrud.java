@@ -28,11 +28,7 @@ public class TelaEstoqueCrud extends JPanel {
     private JTable table;
     private DefaultTableModel tableModel;
 
-<<<<<<< HEAD
-    // ✅ ADICIONE ESTE CAMPO
-=======
 
->>>>>>> 2e79728 (atualizações finais)
     private JComboBox<ProdutoResponse> cbProduto;
 
     private JTextField txtQuantidade;
@@ -52,11 +48,7 @@ public class TelaEstoqueCrud extends JPanel {
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-<<<<<<< HEAD
-        // Tabela - ✅ ADICIONE COLUNA PRODUTO
-=======
 
->>>>>>> 2e79728 (atualizações finais)
         String[] colunas = {"ID", "Produto", "Quantidade", "Capacidade", "%", "Tipo", "Tanque", "Endereço", "Lote", "Validade"};
         tableModel = new DefaultTableModel(colunas, 0) {
             @Override
@@ -69,13 +61,7 @@ public class TelaEstoqueCrud extends JPanel {
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setRowHeight(25);
 
-<<<<<<< HEAD
-=======
-        table.getColumnModel().getColumn(0).setMinWidth(0);
-        table.getColumnModel().getColumn(0).setMaxWidth(0);
-        table.getColumnModel().getColumn(0).setWidth(0);
 
->>>>>>> 2e79728 (atualizações finais)
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
 
@@ -86,7 +72,7 @@ public class TelaEstoqueCrud extends JPanel {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // ✅ ADICIONE COMBO DE PRODUTOS
+        //  ADICIONE COMBO DE PRODUTOS
         cbProduto = new JComboBox<>();
         cbProduto.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -118,33 +104,21 @@ public class TelaEstoqueCrud extends JPanel {
 
         int row = 0;
 
-<<<<<<< HEAD
-        // ✅ PRODUTO (NOVO CAMPO)
-=======
 
->>>>>>> 2e79728 (atualizações finais)
         gbc.gridx = 0; gbc.gridy = row;
         formPanel.add(new JLabel("Produto:"), gbc);
         gbc.gridx = 1;
         formPanel.add(cbProduto, gbc);
         row++;
 
-<<<<<<< HEAD
-        // Quantidade
-=======
 
->>>>>>> 2e79728 (atualizações finais)
         gbc.gridx = 0; gbc.gridy = row;
         formPanel.add(new JLabel("Quantidade (litros):"), gbc);
         gbc.gridx = 1;
         formPanel.add(txtQuantidade, gbc);
         row++;
 
-<<<<<<< HEAD
-        // Capacidade Máxima
-=======
 
->>>>>>> 2e79728 (atualizações finais)
         gbc.gridx = 0; gbc.gridy = row;
         formPanel.add(new JLabel("Capacidade Máxima:"), gbc);
         gbc.gridx = 1;
@@ -152,11 +126,7 @@ public class TelaEstoqueCrud extends JPanel {
         formPanel.add(lblCapacidadeMaxima, gbc);
         row++;
 
-<<<<<<< HEAD
-        // Percentual
-=======
 
->>>>>>> 2e79728 (atualizações finais)
         gbc.gridx = 0; gbc.gridy = row;
         formPanel.add(new JLabel("Percentual:"), gbc);
         gbc.gridx = 1;
@@ -164,11 +134,7 @@ public class TelaEstoqueCrud extends JPanel {
         formPanel.add(lblPercentual, gbc);
         row++;
 
-<<<<<<< HEAD
-        // Tipo Estoque
-=======
 
->>>>>>> 2e79728 (atualizações finais)
         gbc.gridx = 0; gbc.gridy = row;
         formPanel.add(new JLabel("Tipo Estoque:"), gbc);
         gbc.gridx = 1;
@@ -220,11 +186,7 @@ public class TelaEstoqueCrud extends JPanel {
 
         add(formPanel, BorderLayout.SOUTH);
 
-<<<<<<< HEAD
-        // Ações
-=======
-        //ações
->>>>>>> 2e79728 (atualizações finais)
+
         btnNovo.addActionListener(e -> limparFormulario());
         btnSalvar.addActionListener(e -> salvarOuAtualizar());
         btnExcluir.addActionListener(e -> excluirSelecionado());
@@ -240,20 +202,12 @@ public class TelaEstoqueCrud extends JPanel {
             }
         });
 
-<<<<<<< HEAD
-        // ✅ CARREGA PRODUTOS E ESTOQUES
-=======
 
->>>>>>> 2e79728 (atualizações finais)
         carregarProdutos();
         carregarEstoques();
     }
 
-<<<<<<< HEAD
-    // ✅ NOVO MÉTODO - Carrega produtos no combo
-=======
 
->>>>>>> 2e79728 (atualizações finais)
     private void carregarProdutos() {
         SwingWorker<List<ProdutoResponse>, Void> worker = new SwingWorker<>() {
             @Override
@@ -320,7 +274,6 @@ public class TelaEstoqueCrud extends JPanel {
         }
     }
 
-    // ✅ MÉTODO PÚBLICO para recarregar de fora
     public void recarregarEstoques() {
         carregarEstoques();
     }
@@ -334,11 +287,8 @@ public class TelaEstoqueCrud extends JPanel {
                     return resp != null ? List.of(resp) : List.of();
                 } catch (Exception ex) {
                     System.err.println("Erro ao carregar estoques: " + ex.getMessage());
-<<<<<<< HEAD
-                    ex.printStackTrace(); // ✅ Mostra erro completo
-=======
+
                     ex.printStackTrace();
->>>>>>> 2e79728 (atualizações finais)
                     return List.of();
                 }
             }
@@ -349,11 +299,7 @@ public class TelaEstoqueCrud extends JPanel {
                     List<EstoqueResponse> estoques = get();
                     tableModel.setRowCount(0);
                     for (EstoqueResponse est : estoques) {
-<<<<<<< HEAD
-                        // ✅ Debug: imprime para verificar se o nome vem do backend
-=======
 
->>>>>>> 2e79728 (atualizações finais)
                         System.out.println("Estoque ID: " + est.id() +
                                 ", Produto: " + est.nomeProduto() +
                                 ", Qtd: " + est.quantidade());
@@ -388,8 +334,7 @@ public class TelaEstoqueCrud extends JPanel {
     private void preencherFormulario() {
         int linhaSelecionada = table.getSelectedRow();
         if (linhaSelecionada >= 0) {
-<<<<<<< HEAD
-            // ✅ Seleciona o produto correto no combo
+
             String nomeProduto = String.valueOf(tableModel.getValueAt(linhaSelecionada, 1));
             for (int i = 0; i < cbProduto.getItemCount(); i++) {
                 ProdutoResponse p = cbProduto.getItemAt(i);
@@ -405,9 +350,8 @@ public class TelaEstoqueCrud extends JPanel {
             txtEndereco.setText(String.valueOf(tableModel.getValueAt(linhaSelecionada, 7)));
             txtLote.setText(String.valueOf(tableModel.getValueAt(linhaSelecionada, 8)));
             txtDataValidade.setText(String.valueOf(tableModel.getValueAt(linhaSelecionada, 9)));
-=======
             Long idEstoque = Long.parseLong(tableModel.getValueAt(linhaSelecionada, 0).toString());
->>>>>>> 2e79728 (atualizações finais)
+
 
             try {
 
@@ -481,9 +425,9 @@ public class TelaEstoqueCrud extends JPanel {
 
             BigDecimal quantidade = new BigDecimal(quantidadeStr);
 
-            // ✅ ENVIA produtoId NO REQUEST
+            //  ENVIA produtoId NO REQUEST
             EstoqueRequest req = new EstoqueRequest(
-                    produto.id(),        // ✅ NOVO CAMPO
+                    produto.id(),
                     quantidade,
                     tanque,
                     endereco,

@@ -20,11 +20,8 @@ public class TelaVenda extends JFrame {
     private final BombaResponse bomba;
     private final AcessoResponse usuario;
     private final TelaPrincipal telaPrincipal;
-<<<<<<< HEAD
-    private EstoqueUpdateListener estoqueUpdateListener; // ✅ NOVO
-=======
+
     private EstoqueUpdateListener estoqueUpdateListener;
->>>>>>> 2e79728 (atualizações finais)
 
     private JComboBox<ProdutoResponse> cbProduto;
     private JTextField txtLitros;
@@ -44,10 +41,7 @@ public class TelaVenda extends JFrame {
         carregarProdutos();
     }
 
-<<<<<<< HEAD
-    // ✅ NOVO MÉTODO - Permite registrar listener
-=======
->>>>>>> 2e79728 (atualizações finais)
+
     public void setEstoqueUpdateListener(EstoqueUpdateListener listener) {
         this.estoqueUpdateListener = listener;
     }
@@ -242,10 +236,7 @@ public class TelaVenda extends JFrame {
                 try {
                     return restTemplate.getForObject(API_PRECOS + "/" + produtoSelecionado.id(), PrecoResponse.class);
                 } catch (Exception e) {
-<<<<<<< HEAD
-                    System.err.println("Preço específico não encontrado, usando preço geral");
-=======
->>>>>>> 2e79728 (atualizações finais)
+
                     PrecoResponse[] precos = restTemplate.getForObject(API_PRECOS, PrecoResponse[].class);
                     return (precos != null && precos.length > 0) ? precos[precos.length - 1] : null;
                 }
@@ -314,9 +305,7 @@ public class TelaVenda extends JFrame {
                 protected void done() {
                     try {
                         VendaResponse venda = get();
-<<<<<<< HEAD
 
-                        // ✅ NOTIFICA QUE O ESTOQUE FOI ATUALIZADO
                         if (estoqueUpdateListener != null) {
                             estoqueUpdateListener.onEstoqueAtualizado();
                         }
@@ -325,8 +314,7 @@ public class TelaVenda extends JFrame {
                                 TelaVenda.this,
                                 String.format("Venda realizada com sucesso!\nTotal: R$ %.2f", venda.valorTotal()),
                                 "Sucesso",
-                                JOptionPane.INFORMATION_MESSAGE
-=======
+                                JOptionPane.INFORMATION_MESSAGE);
                         if (estoqueUpdateListener != null) estoqueUpdateListener.onEstoqueAtualizado();
 
                         String API_CUSTOS = "http://localhost:8080/api/v1/custos/" + produto.id();
@@ -348,7 +336,6 @@ public class TelaVenda extends JFrame {
                                 precoAtual.valor().multiply(litros).doubleValue(),
                                 impostoPercentual.doubleValue(),
                                 formaPagamento
->>>>>>> 2e79728 (atualizações finais)
                         );
 
                         comprovante.setVisible(true);
@@ -356,7 +343,6 @@ public class TelaVenda extends JFrame {
 
                         voltar();
                     } catch (Exception ex) {
-<<<<<<< HEAD
                         ex.printStackTrace();
                         String errorMsg = ex.getMessage();
                         if (errorMsg != null && errorMsg.contains("Estoque insuficiente")) {
@@ -374,9 +360,7 @@ public class TelaVenda extends JFrame {
                                     JOptionPane.ERROR_MESSAGE
                             );
                         }
-=======
-                        JOptionPane.showMessageDialog(TelaVenda.this, "Erro ao realizar venda: " + ex.getMessage());
->>>>>>> 2e79728 (atualizações finais)
+
                         btnConfirmar.setEnabled(true);
                         btnConfirmar.setText("CONFIRMAR VENDA");
                     }
